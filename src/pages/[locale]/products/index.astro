@@ -1,0 +1,11 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import ProductCard from '../../../components/ProductCard.astro';
+import { getLocale, getProducts, locales, siteCopy } from '../../../content/site';
+export function getStaticPaths() { return locales.map((locale) => ({ params: { locale } })); }
+const locale = getLocale(Astro.params.locale); const copy = siteCopy[locale]; const products = getProducts(locale);
+---
+<BaseLayout locale={locale} path="products" title={copy.nav.products} description={copy.brandStatement}>
+  <section class="page-intro"><p class="eyebrow">QUINT / {copy.nav.products}</p><h1>{locale === 'it' ? 'Tecnologia con una direzione chiara' : 'Technology with a clear direction'}</h1><p>{locale === 'it' ? 'Esplora le soluzioni Quint per diagnostica, ricerca e qualità.' : 'Explore Quint solutions for diagnostics, research and quality.'}</p></section>
+  {(['diagnostics', 'research', 'quality'] as const).map((family) => <section class="section family-section" aria-labelledby={`${family}-title`}><div class="section-heading"><p class="eyebrow">0{(['diagnostics', 'research', 'quality'] as const).indexOf(family) + 1}</p><h2 id={`${family}-title`}>{copy.families[family].title}</h2><p>{copy.families[family].description}</p></div><div class="card-grid">{products.filter((product) => product.family === family).map((product) => <ProductCard product={product} locale={locale} />)}</div></section>)}
+</BaseLayout>

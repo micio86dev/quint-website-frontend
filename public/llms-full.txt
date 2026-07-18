@@ -1,0 +1,3 @@
+# Quint full site guide
+
+Quint is a multilingual scientific-solutions website. It presents three product umbrellas: Diagnostics, Research and Quality. The contact form accepts business enquiries and is processed by the local PocketBase backend. Administrative functions are intentionally excluded from the public website and should not be indexed.

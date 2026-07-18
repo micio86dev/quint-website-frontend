@@ -1,0 +1,40 @@
+---
+import { getLocale, localizedPath, siteCopy, type Locale } from '../content/site';
+import '../styles/global.css';
+const { locale: candidate, title, description, path = '' } = Astro.props as { locale: Locale; title: string; description: string; path?: string };
+const locale = getLocale(candidate);
+const copy = siteCopy[locale];
+const canonical = new URL(localizedPath(locale, path), Astro.site);
+const alternate = locale === 'it' ? 'en' : 'it';
+const primaryNavigationLabel = locale === 'it' ? 'Navigazione principale' : 'Primary navigation';
+const production = import.meta.env.PROD;
+---
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title} | Quint</title>
+    <meta name="description" content={description} />
+    <meta name="robots" content={production ? 'index,follow' : 'noindex,nofollow'} />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" hreflang={locale} href={canonical} />
+    <link rel="alternate" hreflang={alternate} href={new URL(localizedPath(alternate, path), Astro.site)} />
+    <link rel="alternate" hreflang="x-default" href={new URL(localizedPath('it', path), Astro.site)} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={`${title} | Quint`} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta name="theme-color" content="#771AAF" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <script type="application/ld+json" set:html={JSON.stringify({ '@context': 'https://schema.org', '@type': 'Organization', name: 'Quint', url: Astro.site?.toString(), description: copy.brandStatement })} />
+  </head>
+  <body>
+    <a class="skip-link" href="#content">{locale === 'it' ? 'Vai al contenuto' : 'Skip to content'}</a>
+    <header class="site-header"><a class="brand" href={localizedPath(locale)} aria-label="Quint home">QUINT<span>●</span></a><nav aria-label={primaryNavigationLabel}><a href={localizedPath(locale)}>{copy.nav.home}</a><a href={localizedPath(locale, 'products')}>{copy.nav.products}</a><a href={localizedPath(locale, 'contact')}>{copy.nav.contact}</a></nav><a class="language-link" href={localizedPath(alternate, path)} lang={alternate}>{copy.languageName}</a></header>
+    <main id="content"><slot /></main>
+    <footer class="site-footer"><p><strong>QUINT</strong> — {copy.footer}</p><a href={localizedPath(locale, 'contact')}>{copy.nav.contact}</a></footer>
+  </body>
+</html>

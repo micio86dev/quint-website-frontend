@@ -1,0 +1,10 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import { getLocale, getProduct, getProducts, locales, localizedPath, siteCopy, type Locale, type Product } from '../../../../content/site';
+export function getStaticPaths() { return locales.flatMap((locale: Locale) => getProducts(locale).map((product: Product) => ({ params: { locale, family: product.family, slug: product.slug } }))); }
+const locale = getLocale(Astro.params.locale); const product = getProduct(locale, Astro.params.slug ?? ''); const copy = siteCopy[locale];
+if (!product || product.family !== Astro.params.family) return Astro.redirect(localizedPath(locale, 'products'));
+---
+<BaseLayout locale={locale} path={`products/${product.family}/${product.slug}`} title={product.title} description={product.summary}>
+  <section class="product-hero"><p class="eyebrow">{copy.families[product.family].title}</p><h1>{product.title}</h1><p>{product.summary}</p><div class="product-benefit"><span aria-hidden="true">✦</span><p>{product.benefit}</p></div><a class="button primary" href={localizedPath(locale, 'contact')}>{copy.cta}</a></section>
+</BaseLayout>

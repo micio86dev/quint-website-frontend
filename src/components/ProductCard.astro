@@ -1,0 +1,6 @@
+---
+import { localizedPath, siteCopy, type Locale, type Product } from '../content/site';
+const { product, locale } = Astro.props as { product: Product; locale: Locale };
+const family = siteCopy[locale].families[product.family];
+---
+<article class="product-card"><p class="eyebrow">{family.title}</p><h3>{product.title}</h3><p>{product.summary}</p><a href={localizedPath(locale, `products/${product.family}/${product.slug}`)}>{locale === 'it' ? 'Scopri di più' : 'Learn more'} <span aria-hidden="true">→</span></a></article>

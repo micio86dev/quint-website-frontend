@@ -1,0 +1,10 @@
+# Quint
+
+Quint provides scientific technology for diagnostics, research and quality control.
+
+## Key pages
+- /it/ and /en/: overview and contact access
+- /it/products/ and /en/products/: solutions catalogue
+- /it/contact/ and /en/contact/: business contact form
+
+Content is available in Italian and English. Product pages describe rapid diagnostics, molecular diagnostics, clinical analyzers, cell analysis, sample preparation, research imaging, process monitoring and quality control.

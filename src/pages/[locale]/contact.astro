@@ -1,0 +1,10 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ContactForm from '../../components/ContactForm.astro';
+import { getLocale, locales, siteCopy, type Locale } from '../../content/site';
+export function getStaticPaths() { return locales.map((locale: Locale) => ({ params: { locale } })); }
+const locale = getLocale(Astro.params.locale); const copy = siteCopy[locale].contact;
+---
+<BaseLayout locale={locale} path="contact" title={copy.title} description={copy.intro}>
+  <section class="contact-page"><div><p class="eyebrow">QUINT / CONTACT</p><h1>{copy.title}</h1><p>{copy.intro}</p></div><ContactForm locale={locale} /></section>
+</BaseLayout>

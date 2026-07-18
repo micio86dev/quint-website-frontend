@@ -1,0 +1,11 @@
+---
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import ProductCard from '../../../../components/ProductCard.astro';
+import { getLocale, getProducts, locales, siteCopy, type Product } from '../../../../content/site';
+export function getStaticPaths() { return locales.flatMap((locale) => ['diagnostics', 'research', 'quality'].map((family) => ({ params: { locale, family } }))); }
+const locale = getLocale(Astro.params.locale); const family = Astro.params.family as Product['family']; const copy = siteCopy[locale]; const products = getProducts(locale).filter((product) => product.family === family);
+if (!['diagnostics', 'research', 'quality'].includes(family)) return Astro.redirect(`/${locale}/products/`);
+---
+<BaseLayout locale={locale} path={`products/${family}`} title={copy.families[family].title} description={copy.families[family].description}>
+  <section class="page-intro"><p class="eyebrow">QUINT / {copy.nav.products}</p><h1>{copy.families[family].title}</h1><p>{copy.families[family].description}</p></section><section class="section"><div class="card-grid">{products.map((product) => <ProductCard product={product} locale={locale} />)}</div></section>
+</BaseLayout>

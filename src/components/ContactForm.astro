@@ -1,0 +1,87 @@
+---
+import { siteCopy, type Locale } from '../content/site';
+const { locale } = Astro.props as { locale: Locale };
+const copy = siteCopy[locale].contact;
+const errorCopy = locale === 'it' ? { name: 'Inserisci il tuo nome.', email: 'Inserisci un’email valida.', message: 'Il messaggio deve contenere almeno 12 caratteri.' } : { name: 'Please enter your name.', email: 'Please enter a valid email address.', message: 'Your message must contain at least 12 characters.' };
+---
+<form
+  data-testid="contact-form"
+  class="contact-form"
+  data-locale={locale}
+  data-success={copy.success}
+  data-failure={copy.failure}
+  data-error-name={errorCopy.name}
+  data-error-email={errorCopy.email}
+  data-error-message={errorCopy.message}
+  novalidate
+>
+  <div class="form-grid">
+    <label>{copy.name}<input name="name" autocomplete="name" required minlength="2" /></label>
+    <label>{copy.email}<input name="email" type="email" autocomplete="email" required /></label>
+    <label>{copy.company}<input name="company" autocomplete="organization" /></label>
+    <label class="honeypot" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off" /></label>
+  </div>
+  <label>{copy.message}<textarea name="message" required minlength="12" maxlength="2000"></textarea></label>
+  <p class="form-status" role="status" aria-live="polite"></p>
+  <button type="submit">{copy.send}</button>
+</form>
+<script>
+  import { contactEndpoint, validateContact } from '../lib/contact';
+  const form = document.querySelector<HTMLFormElement>('[data-testid="contact-form"]');
+  const status = form?.querySelector<HTMLElement>('.form-status');
+  const errorCopy = {
+    name: form?.dataset.errorName ?? '',
+    email: form?.dataset.errorEmail ?? '',
+    message: form?.dataset.errorMessage ?? ''
+  };
+
+  form?.addEventListener('submit', async (event: SubmitEvent) => {
+    event.preventDefault();
+    const submittedValues = Object.fromEntries(new FormData(form).entries());
+    const payload = {
+      name: String(submittedValues.name ?? ''),
+      email: String(submittedValues.email ?? ''),
+      company: String(submittedValues.company ?? ''),
+      message: String(submittedValues.message ?? ''),
+      website: String(submittedValues.website ?? ''),
+      locale: form.dataset.locale ?? 'it'
+    };
+    const check = validateContact(payload);
+    form.querySelectorAll<HTMLElement>('[aria-describedby], [aria-invalid]').forEach((input) => {
+      input.removeAttribute('aria-describedby');
+      input.removeAttribute('aria-invalid');
+    });
+    form.querySelectorAll<HTMLElement>('[data-error]').forEach((node) => node.remove());
+    if (!check.valid) {
+      let firstInvalidField: HTMLInputElement | HTMLTextAreaElement | undefined;
+      Object.keys(check.errors).forEach((field) => {
+        if (field === 'website') return;
+        const input = form.elements.namedItem(field);
+        if (!(input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement)) return;
+        const error = document.createElement('span');
+        error.id = `error-${field}`;
+        error.dataset.error = field;
+        error.className = 'field-error';
+        error.textContent = errorCopy[field as keyof typeof errorCopy];
+        input.after(error);
+        input.setAttribute('aria-describedby', `error-${field}`);
+        input.setAttribute('aria-invalid', 'true');
+        firstInvalidField ??= input;
+      });
+      firstInvalidField?.focus();
+      if (status) status.textContent = '';
+      return;
+    }
+    const button = form.querySelector<HTMLButtonElement>('button[type="submit"], button:not([type])');
+    if (!button) return;
+    button.disabled = true;
+    try {
+      const response = await fetch(contactEndpoint(import.meta.env.PUBLIC_API_URL), { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) });
+      if (!response.ok) throw new Error('request failed');
+      form.reset();
+      if (status) status.textContent = form.dataset.success ?? '';
+    } catch {
+      if (status) status.textContent = form.dataset.failure ?? '';
+    } finally { button.disabled = false; }
+  });
+</script>

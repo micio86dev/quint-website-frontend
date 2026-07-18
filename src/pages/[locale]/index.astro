@@ -1,0 +1,12 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProductCard from '../../components/ProductCard.astro';
+import { getLocale, getProducts, locales, localizedPath, siteCopy } from '../../content/site';
+export function getStaticPaths() { return locales.map((locale) => ({ params: { locale } })); }
+const locale = getLocale(Astro.params.locale); const copy = siteCopy[locale]; const products = getProducts(locale);
+---
+<BaseLayout locale={locale} title="Quint" description={copy.brandStatement}>
+  <section class="hero"><div><p class="eyebrow">{copy.hero.eyebrow}</p><h1>{copy.hero.title}</h1><p class="hero-copy">{copy.hero.body}</p><div class="actions"><a class="button primary" href={localizedPath(locale, 'contact')}>{copy.cta}</a><a class="button secondary" href={localizedPath(locale, 'products')}>{copy.secondaryCta}</a></div></div><aside class="hero-panel"><p>{copy.trusted}</p><strong>01—03</strong><span>{locale === 'it' ? 'Diagnostica · Ricerca · Qualità' : 'Diagnostics · Research · Quality'}</span></aside></section>
+  <section class="section" aria-labelledby="featured-products"><div class="section-heading"><p class="eyebrow">{locale === 'it' ? 'Le nostre soluzioni' : 'Our solutions'}</p><h2 id="featured-products">{locale === 'it' ? 'Una risposta concreta per ogni workflow' : 'A practical answer for every workflow'}</h2></div><div class="card-grid">{products.slice(0, 3).map((product) => <ProductCard product={product} locale={locale} />)}</div></section>
+  <section class="statement"><p>{copy.brandStatement}</p><a href={localizedPath(locale, 'products')}>{copy.secondaryCta} <span aria-hidden="true">→</span></a></section>
+</BaseLayout>
