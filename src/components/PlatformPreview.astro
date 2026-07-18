@@ -1,0 +1,36 @@
+---
+import type { HomeCopy, Locale } from '../content/site';
+
+const { copy, locale } = Astro.props as { copy: HomeCopy['hero']; locale: Locale };
+const workflowLabel = locale === 'it' ? 'Andamento del flusso di lavoro' : 'Workflow trend';
+---
+
+<section class="platform-preview" aria-labelledby="platform-preview-title" data-reveal>
+  <header class="platform-preview__header">
+    <span class="platform-preview__brand">{copy.platformLabel}</span>
+    <span class="platform-preview__status"><i aria-hidden="true"></i>{copy.platformStatus}</span>
+  </header>
+  <div class="platform-preview__body">
+    <aside class="platform-preview__rail" aria-hidden="true">
+      <span></span><span></span><span></span><span></span>
+    </aside>
+    <div class="platform-preview__workspace">
+      <div class="platform-preview__intro">
+        <p class="eyebrow">Q / 01</p>
+        <h2 id="platform-preview-title">{copy.platformTitle}</h2>
+        <p>{copy.platformDescription}</p>
+      </div>
+      <div class="platform-preview__signals">
+        {copy.platformSignals.map((signal) => <div><span>{signal.label}</span><strong>{signal.value}</strong></div>)}
+      </div>
+      <div class="platform-preview__chart" aria-label={workflowLabel}>
+        <svg viewBox="0 0 520 170" role="img" aria-label={workflowLabel} preserveAspectRatio="none">
+          <path class="platform-preview__guide" d="M0 130H520M0 85H520M0 40H520" />
+          <path class="platform-preview__line" d="M0 128C38 126 60 92 98 100S151 133 190 92S247 89 284 75S351 112 385 63S442 32 520 22" />
+          <circle cx="385" cy="63" r="6" />
+          <circle cx="520" cy="22" r="6" />
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>

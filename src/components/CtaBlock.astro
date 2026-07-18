@@ -1,0 +1,14 @@
+---
+import type { HomeCopy } from '../content/site';
+
+const { copy, href } = Astro.props as { copy: HomeCopy['finalCta']; href: string };
+---
+
+<section class="cta-block" aria-labelledby="cta-title">
+  <div>
+    <p class="eyebrow">{copy.eyebrow}</p>
+    <h2 id="cta-title">{copy.title}</h2>
+    <p>{copy.body}</p>
+  </div>
+  <a class="button button--light" href={href}>{copy.action}<span aria-hidden="true">→</span></a>
+</section>

@@ -1,0 +1,18 @@
+---
+import type { HomeCopy } from '../content/site';
+
+const { copy } = Astro.props as { copy: HomeCopy['capabilities'] };
+---
+
+<section class="home-section capability-section" aria-labelledby="capability-title">
+  <div class="section-heading section-heading--split">
+    <div>
+      <p class="eyebrow">{copy.eyebrow}</p>
+      <h2 id="capability-title">{copy.title}</h2>
+    </div>
+    <p>{copy.body}</p>
+  </div>
+  <ol class="capability-list">
+    {copy.items.map((item) => <li><span>{item.number}</span><div><h3>{item.title}</h3><p>{item.body}</p></div></li>)}
+  </ol>
+</section>

@@ -2,7 +2,9 @@ import { expect, test } from '@playwright/test';
 
 test('Italian home guides a visitor to products and contact', async ({ page }) => {
   await page.goto('/it/');
-  await expect(page.getByRole('heading', { name: 'Tecnologie che rendono affidabili le decisioni' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Dati scientifici più chiari. Decisioni più sicure.' })).toBeVisible();
+  await expect(page.getByText('Piattaforma scientifica Quint', { exact: true })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Intelligenza dei flussi di lavoro' })).toBeVisible();
   await page.getByRole('link', { name: 'Scopri le soluzioni' }).first().click();
   await expect(page).toHaveURL(/\/it\/products\/$/);
   await page.getByRole('navigation', { name: 'Navigazione principale' }).getByRole('link', { name: 'Contatti' }).click();

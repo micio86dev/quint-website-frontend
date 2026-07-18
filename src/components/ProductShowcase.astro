@@ -1,0 +1,25 @@
+---
+import ProductCard from './ProductCard.astro';
+import type { HomeCopy, Locale, Product } from '../content/site';
+
+const { copy, products, locale, allProductsHref } = Astro.props as {
+  copy: HomeCopy['product'];
+  products: Product[];
+  locale: Locale;
+  allProductsHref: string;
+};
+---
+
+<section class="home-section product-showcase" aria-labelledby="featured-products">
+  <div class="section-heading section-heading--split">
+    <div>
+      <p class="eyebrow">{copy.eyebrow}</p>
+      <h2 id="featured-products">{copy.title}</h2>
+    </div>
+    <p>{copy.body}</p>
+  </div>
+  <div class="product-grid">
+    {products.map((product) => <ProductCard product={product} locale={locale} />)}
+  </div>
+  <a class="text-link" href={allProductsHref}>{copy.allProducts}<span aria-hidden="true">→</span></a>
+</section>

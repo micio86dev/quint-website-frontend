@@ -1,0 +1,25 @@
+---
+import type { HomeCopy, Locale } from '../content/site';
+import PlatformPreview from './PlatformPreview.astro';
+
+const { copy, locale, primaryAction, secondaryAction } = Astro.props as {
+  copy: HomeCopy['hero'];
+  locale: Locale;
+  primaryAction: { href: string; label: string };
+  secondaryAction: { href: string; label: string };
+};
+---
+
+<section class="home-hero" aria-labelledby="home-hero-title">
+  <div class="home-hero__copy" data-reveal>
+    <p class="eyebrow">{copy.eyebrow}</p>
+    <h1 id="home-hero-title">{copy.title}</h1>
+    <p class="hero-copy">{copy.body}</p>
+    <div class="actions">
+      <a class="button primary" href={primaryAction.href}>{primaryAction.label}<span aria-hidden="true">→</span></a>
+      <a class="button secondary" href={secondaryAction.href}>{secondaryAction.label}<span aria-hidden="true">→</span></a>
+    </div>
+    <p class="home-hero__assurance"><span aria-hidden="true">●</span>{copy.assurance}</p>
+  </div>
+  <PlatformPreview copy={copy} locale={locale} />
+</section>

@@ -33,7 +33,7 @@ const production = import.meta.env.PROD;
   </head>
   <body>
     <a class="skip-link" href="#content">{locale === 'it' ? 'Vai al contenuto' : 'Skip to content'}</a>
-    <header class="site-header"><a class="brand" href={localizedPath(locale)} aria-label="Quint home">QUINT<span>●</span></a><nav aria-label={primaryNavigationLabel}><a href={localizedPath(locale)}>{copy.nav.home}</a><a href={localizedPath(locale, 'products')}>{copy.nav.products}</a><a href={localizedPath(locale, 'contact')}>{copy.nav.contact}</a></nav><a class="language-link" href={localizedPath(alternate, path)} lang={alternate}>{copy.languageName}</a></header>
+    <header class="site-header"><a class="brand" href={localizedPath(locale)} aria-label="Quint home">QUINT<span aria-hidden="true">●</span></a><nav aria-label={primaryNavigationLabel}><a href={localizedPath(locale)}>{copy.nav.home}</a><a href={localizedPath(locale, 'products')}>{copy.nav.products}</a><a href={localizedPath(locale, 'contact')}>{copy.nav.contact}</a></nav><a class="language-link" href={localizedPath(alternate, path)} lang={alternate}>{copy.languageName}</a></header>
     <main id="content"><slot /></main>
     <footer class="site-footer"><p><strong>QUINT</strong> — {copy.footer}</p><a href={localizedPath(locale, 'contact')}>{copy.nav.contact}</a></footer>
   </body>

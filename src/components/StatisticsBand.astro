@@ -1,0 +1,11 @@
+---
+import type { HomeCopy } from '../content/site';
+
+const { statistics, label } = Astro.props as { statistics: HomeCopy['statistics']; label: string };
+---
+
+<section class="statistics-band" aria-label={label}>
+  <div>
+    {statistics.map((statistic) => <p><strong>{statistic.value}</strong><span>{statistic.label}</span></p>)}
+  </div>
+</section>
