@@ -12,7 +12,7 @@ function splitStat(value: string) {
 }
 ---
 
-<section class="bg-orange" aria-label={label}>
+<section class="bg-orange-dark" aria-label={label}>
   <div
     class="grid grid-cols-1 md:grid-cols-3 max-w-[1200px] mx-auto px-[clamp(1.25rem,4vw,3rem)]"
     data-reveal-stagger
@@ -31,7 +31,7 @@ function splitStat(value: string) {
           ) : (
             <strong class="text-white text-[clamp(2.25rem,4vw,3.65rem)] tracking-[-0.07em] leading-none">{statistic.value}</strong>
           )}
-          <span class="max-w-[17ch] text-white/80 text-[0.82rem] font-bold">{statistic.label}</span>
+          <span class="max-w-[17ch] text-white text-[0.82rem] font-bold">{statistic.label}</span>
         </p>
       );
     })}

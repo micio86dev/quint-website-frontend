@@ -62,7 +62,7 @@ const currentYear = new Date().getFullYear();
         </button>
       </div>
     </header>
-    <div class="mobile-nav" id="mobile-nav" aria-hidden="true" aria-label={t['nav.primaryLabel']}>
+    <div class="mobile-nav" id="mobile-nav" inert aria-label={t['nav.primaryLabel']}>
       <button class="mobile-nav__close" id="mobile-nav-close" type="button" aria-label={t['nav.menuClose']}>
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
           <line x1="4" y1="4" x2="16" y2="16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
@@ -107,14 +107,14 @@ const currentYear = new Date().getFullYear();
 
       function openMenu() {
         toggle.setAttribute('aria-expanded', 'true');
-        mobileNav.setAttribute('aria-hidden', 'false');
+        mobileNav.removeAttribute('inert');
         document.body.style.overflow = 'hidden';
         toggle.setAttribute('aria-label', toggle.dataset.labelClose ?? '');
       }
 
       function closeMenu() {
         toggle.setAttribute('aria-expanded', 'false');
-        mobileNav.setAttribute('aria-hidden', 'true');
+        mobileNav.setAttribute('inert', '');
         document.body.style.overflow = '';
         toggle.setAttribute('aria-label', toggle.dataset.labelOpen ?? '');
       }
@@ -289,7 +289,7 @@ const currentYear = new Date().getFullYear();
         transition: background 150ms;
       }
       .mobile-nav__close:hover { background: rgb(255 255 255 / 20%); }
-      .mobile-nav[aria-hidden="false"] { opacity: 1; transform: translateY(0); pointer-events: auto; }
+      .mobile-nav:not([inert]) { opacity: 1; transform: translateY(0); pointer-events: auto; }
       .mobile-nav nav {
         display: flex;
         flex-direction: column;
@@ -308,11 +308,11 @@ const currentYear = new Date().getFullYear();
         opacity: 0;
         transform: translateX(-18px);
       }
-      .mobile-nav[aria-hidden="false"] nav a { animation: mobile-link-in 350ms var(--ease-quint) both; }
-      .mobile-nav[aria-hidden="false"] nav a:nth-child(1) { animation-delay: 40ms; }
-      .mobile-nav[aria-hidden="false"] nav a:nth-child(2) { animation-delay: 90ms; }
-      .mobile-nav[aria-hidden="false"] nav a:nth-child(3) { animation-delay: 140ms; }
-      .mobile-nav[aria-hidden="false"] nav a:nth-child(4) { animation-delay: 190ms; }
+      .mobile-nav:not([inert]) nav a { animation: mobile-link-in 350ms var(--ease-quint) both; }
+      .mobile-nav:not([inert]) nav a:nth-child(1) { animation-delay: 40ms; }
+      .mobile-nav:not([inert]) nav a:nth-child(2) { animation-delay: 90ms; }
+      .mobile-nav:not([inert]) nav a:nth-child(3) { animation-delay: 140ms; }
+      .mobile-nav:not([inert]) nav a:nth-child(4) { animation-delay: 190ms; }
       @keyframes mobile-link-in {
         from { opacity: 0; transform: translateX(-18px); }
         to   { opacity: 1; transform: translateX(0); }

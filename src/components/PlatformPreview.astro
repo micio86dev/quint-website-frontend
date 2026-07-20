@@ -29,14 +29,13 @@ const railLabels = slideNames.slice(0, totalSlides);
     <span class="platform-preview__status"><i aria-hidden="true"></i>{copy.platformStatus}</span>
   </header>
   <div class="platform-preview__body">
-    <aside class="platform-preview__rail" role="tablist" aria-label={ui.slides}>
+    <div class="platform-preview__rail" role="group" aria-label={ui.slides}>
       {railLabels.map((label, i) => (
         <button
           class="beai-rail-check"
           data-index={i}
           type="button"
-          role="tab"
-          aria-selected={i === 0 ? 'true' : 'false'}
+          aria-current={i === 0 ? 'true' : 'false'}
           aria-label={label}
         >
           <svg viewBox="0 0 12 12" fill="none" aria-hidden="true">
@@ -44,7 +43,7 @@ const railLabels = slideNames.slice(0, totalSlides);
           </svg>
         </button>
       ))}
-    </aside>
+    </div>
     <div class="platform-preview__workspace">
 
       <div class="platform-preview__intro">
@@ -188,10 +187,10 @@ const railLabels = slideNames.slice(0, totalSlides);
 
     function goTo(idx) {
       slides[cur].dataset.active = 'false';
-      checks[cur] && checks[cur].setAttribute('aria-selected', 'false');
+      checks[cur] && checks[cur].setAttribute('aria-current', 'false');
       cur = ((idx % slides.length) + slides.length) % slides.length;
       slides[cur].dataset.active = 'true';
-      checks[cur] && checks[cur].setAttribute('aria-selected', 'true');
+      checks[cur] && checks[cur].setAttribute('aria-current', 'true');
     }
 
     function start() { timer = setInterval(function () { goTo(cur + 1); }, 4500); }
@@ -296,7 +295,7 @@ const railLabels = slideNames.slice(0, totalSlides);
 
   .beai-rail-check svg { width: 12px; height: 12px; }
   .beai-rail-check:hover { border-color: #fff; }
-  .beai-rail-check[aria-selected="true"] {
+  .beai-rail-check[aria-current="true"] {
     background: var(--color-orange);
     border-color: var(--color-orange);
     color: #fff;
