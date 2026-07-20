@@ -176,14 +176,20 @@ const { locale, copy, errorCopy } = Astro.props;
 </script>
 
 <style>
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.4rem 1.1rem;
+  }
+
   .form-field {
     display: flex;
     flex-direction: column;
-    gap: 0.35rem;
+    gap: 0.4rem;
   }
 
   .form-field--full {
-    margin-top: 1rem;
+    margin-top: 1.4rem;
   }
 
   .form-legend {
