@@ -8,6 +8,7 @@ export default defineConfig({
   use: { baseURL: 'http://127.0.0.1:4322', trace: 'on-first-retry', screenshot: 'only-on-failure' },
   webServer: {
     command: 'node ./node_modules/astro/astro.js check && node ./node_modules/astro/astro.js build && node ./node_modules/astro/astro.js preview --host 127.0.0.1 --port 4322',
+    env: { ...process.env, SITE_URL: process.env.SITE_URL ?? 'https://example.test' },
     url: 'http://127.0.0.1:4322/it/',
     reuseExistingServer: false,
     timeout: 120_000

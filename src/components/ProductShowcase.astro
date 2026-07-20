@@ -1,25 +1,44 @@
 ---
 import ProductCard from './ProductCard.astro';
-import type { HomeCopy, Locale, Product } from '../content/site';
+import type { PBProduct } from '../lib/content';
+import type { Locale } from '../content/site';
 
-const { copy, products, locale, allProductsHref } = Astro.props as {
-  copy: HomeCopy['product'];
-  products: Product[];
+interface Props {
+  copy: { eyebrow: string; title: string; body: string; allProducts: string };
+  products: PBProduct[];
   locale: Locale;
   allProductsHref: string;
-};
+  familyTitles: Record<string, string>;
+  learnMore: string;
+}
+
+const { copy, products, locale, allProductsHref, familyTitles, learnMore } = Astro.props;
 ---
 
-<section class="home-section product-showcase" aria-labelledby="featured-products">
-  <div class="section-heading section-heading--split">
+<section
+  class="max-w-[1200px] mx-auto px-[clamp(1.25rem,4vw,3rem)] py-[clamp(4.8rem,9vw,8rem)]"
+  aria-labelledby="featured-products"
+  data-reveal
+>
+  <div class="grid grid-cols-1 gap-6 items-end mb-[clamp(2.2rem,4vw,3.5rem)] md:grid-cols-[minmax(0,1.2fr)_minmax(230px,0.8fr)] md:gap-[clamp(1.5rem,6vw,6rem)]">
     <div>
       <p class="eyebrow">{copy.eyebrow}</p>
-      <h2 id="featured-products">{copy.title}</h2>
+      <h2 id="featured-products" class="m-0 max-w-[17ch] font-extrabold tracking-[-0.06em] text-[clamp(2.2rem,4.2vw,4.25rem)] leading-[1.08]">{copy.title}</h2>
     </div>
-    <p>{copy.body}</p>
+    <p class="m-0 text-muted text-base">{copy.body}</p>
   </div>
-  <div class="product-grid">
-    {products.map((product) => <ProductCard product={product} locale={locale} />)}
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-3" data-reveal-stagger>
+    {products.map((product) => (
+      <ProductCard
+        product={product}
+        locale={locale}
+        familyTitle={familyTitles[product.family] ?? product.family}
+        learnMore={learnMore}
+      />
+    ))}
   </div>
-  <a class="text-link" href={allProductsHref}>{copy.allProducts}<span aria-hidden="true">→</span></a>
+  <a
+    class="group inline-flex items-center gap-[0.45rem] min-h-11 mt-[1.4rem] text-violet text-[0.9rem] font-extrabold no-underline"
+    href={allProductsHref}
+  >{copy.allProducts}<span aria-hidden="true" class="transition-transform duration-200 ease-quint group-hover:translate-x-1">→</span></a>
 </section>

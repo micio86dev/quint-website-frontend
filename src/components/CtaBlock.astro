@@ -1,14 +1,29 @@
 ---
-import type { HomeCopy } from '../content/site';
+interface Props {
+  eyebrow: string;
+  title: string;
+  body: string;
+  action: string;
+  href: string;
+  bgColor?: string;
+  textColor?: string;
+}
 
-const { copy, href } = Astro.props as { copy: HomeCopy['finalCta']; href: string };
+const { eyebrow, title, body, action, href, bgColor, textColor } = Astro.props;
+
+const sectionStyle = `background:${bgColor || 'var(--color-violet)'};color:${textColor || '#fff'};`;
 ---
 
-<section class="cta-block" aria-labelledby="cta-title">
+<section
+  class="flex flex-col items-start gap-10 mx-5 mb-[clamp(4rem,8vw,7rem)] px-[clamp(1.25rem,5vw,5rem)] py-[clamp(2.5rem,6vw,5rem)] rounded-2xl md:flex-row md:items-end md:justify-between md:mx-auto md:max-w-[1200px]"
+  style={sectionStyle}
+  aria-labelledby="cta-title"
+  data-reveal
+>
   <div>
-    <p class="eyebrow">{copy.eyebrow}</p>
-    <h2 id="cta-title">{copy.title}</h2>
-    <p>{copy.body}</p>
+    <p class="eyebrow" style="color:inherit;opacity:0.75;">{eyebrow}</p>
+    <h2 id="cta-title" class="m-0 max-w-[13ch] font-extrabold tracking-[-0.06em] text-[clamp(2.1rem,4vw,4rem)] leading-[1.08]">{title}</h2>
+    <p class="max-w-[53ch] mt-4 mb-0" style="color:inherit;opacity:0.78;">{body}</p>
   </div>
-  <a class="button button--light" href={href}>{copy.action}<span aria-hidden="true">→</span></a>
+  <a class="btn btn-light" href={href}>{action}<span aria-hidden="true">→</span></a>
 </section>

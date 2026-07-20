@@ -4,12 +4,24 @@ import type { HomeCopy } from '../content/site';
 const { eyebrow, items, title } = Astro.props as { eyebrow: string; items: HomeCopy['faq']; title: string };
 ---
 
-<section class="home-section faq-section" aria-labelledby="faq-title">
-  <div class="section-heading">
+<section
+  class="max-w-[1200px] mx-auto px-[clamp(1.25rem,4vw,3rem)] py-[clamp(4.8rem,9vw,8rem)] grid grid-cols-1 gap-8 min-[900px]:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] min-[900px]:gap-[clamp(2.5rem,8vw,9rem)]"
+  aria-labelledby="faq-title"
+  data-reveal
+>
+  <div class="max-w-[800px] mb-0">
     <p class="eyebrow">{eyebrow}</p>
-    <h2 id="faq-title">{title}</h2>
+    <h2 id="faq-title" class="m-0 max-w-[17ch] font-extrabold tracking-[-0.06em] text-[clamp(2.2rem,4.2vw,4.25rem)] leading-[1.08]">{title}</h2>
   </div>
-  <div class="faq-list">
-    {items.map((item, index) => <details open={index === 0}><summary>{item.question}<span aria-hidden="true">+</span></summary><p>{item.answer}</p></details>)}
+  <div class="border-t border-line" data-reveal-stagger>
+    {items.map((item, index) => (
+      <details open={index === 0} class="group border-b border-line">
+        <summary class="flex items-center justify-between gap-6 min-h-[66px] py-4 cursor-pointer text-base font-extrabold list-none [&::-webkit-details-marker]:hidden">
+          {item.question}
+          <span aria-hidden="true" class="flex-none text-violet text-2xl font-normal transition-transform duration-200 ease-quint group-open:rotate-45">+</span>
+        </summary>
+        <p class="max-w-[62ch] m-0 pr-10 pb-[1.35rem] text-muted text-[0.95rem]">{item.answer}</p>
+      </details>
+    ))}
   </div>
 </section>

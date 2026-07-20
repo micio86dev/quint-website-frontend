@@ -1,11 +1,46 @@
 ---
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import ProductCard from '../../../components/ProductCard.astro';
-import { getLocale, getProducts, locales, siteCopy } from '../../../content/site';
-export function getStaticPaths() { return locales.map((locale) => ({ params: { locale } })); }
-const locale = getLocale(Astro.params.locale); const copy = siteCopy[locale]; const products = getProducts(locale);
+import { getLocale, locales, localizedPath } from '../../../content/site';
+import { getSiteText, getProducts } from '../../../lib/content';
+import type { Locale } from '../../../content/site';
+
+export function getStaticPaths() {
+  return locales.map((locale) => ({ params: { locale } }));
+}
+
+const locale = getLocale(Astro.params.locale);
+const [t, products] = await Promise.all([getSiteText(locale), getProducts(locale)]);
+
+const families = ['diagnostics', 'research', 'quality'] as const;
 ---
-<BaseLayout locale={locale} path="products" title={copy.nav.products} description={copy.brandStatement}>
-  <section class="page-intro"><p class="eyebrow">QUINT / {copy.nav.products}</p><h1>{locale === 'it' ? 'Tecnologia con una direzione chiara' : 'Technology with a clear direction'}</h1><p>{locale === 'it' ? 'Esplora le soluzioni Quint per diagnostica, ricerca e qualità.' : 'Explore Quint solutions for diagnostics, research and quality.'}</p></section>
-  {(['diagnostics', 'research', 'quality'] as const).map((family) => <section class="section family-section" aria-labelledby={`${family}-title`}><div class="section-heading"><p class="eyebrow">0{(['diagnostics', 'research', 'quality'] as const).indexOf(family) + 1}</p><h2 id={`${family}-title`}>{copy.families[family].title}</h2><p>{copy.families[family].description}</p></div><div class="card-grid">{products.filter((product) => product.family === family).map((product) => <ProductCard product={product} locale={locale} />)}</div></section>)}
+
+<BaseLayout locale={locale} path="products" title={t['nav.products']} description={t['brandStatement']}>
+  <section class="max-w-[1200px] mx-auto px-[clamp(1.25rem,4vw,3rem)] pt-[clamp(4.5rem,10vw,8rem)] pb-[clamp(3.5rem,8vw,6rem)] border-b border-line" data-reveal>
+    <p class="eyebrow">QUINT / {t['nav.products']}</p>
+    <h1 class="m-0 max-w-[13ch] font-extrabold tracking-[-0.06em] text-[clamp(2.8rem,5.2vw,4.75rem)] leading-[1.03]">{t['products.pageTitle']}</h1>
+    <p class="max-w-[57ch] mt-6 text-muted text-[clamp(1.06rem,1.5vw,1.22rem)]">{t['products.pageIntro']}</p>
+  </section>
+
+  {families.map((family, i) => (
+    <section class="max-w-[1200px] mx-auto px-[clamp(1.25rem,4vw,3rem)] py-[clamp(4.8rem,9vw,8rem)] border-t border-line" aria-labelledby={`${family}-title`}>
+      <div class="grid grid-cols-[minmax(70px,0.2fr)_1fr] gap-x-6 items-baseline mb-[clamp(2.2rem,4vw,3.5rem)]" data-reveal>
+        <p class="eyebrow text-orange text-base row-span-2 col-start-1 self-start">0{i + 1}</p>
+        <h2 id={`${family}-title`} class="col-start-2 m-0 max-w-[17ch] font-extrabold tracking-[-0.06em] text-[clamp(2.2rem,4.2vw,4.25rem)] leading-[1.08]">{t[`families.${family}.title`]}</h2>
+        <p class="col-start-2 m-0 text-muted text-base">{t[`families.${family}.description`]}</p>
+      </div>
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-3" data-reveal-stagger>
+        {products
+          .filter((product) => product.family === family)
+          .map((product) => (
+            <ProductCard
+              product={product}
+              locale={locale}
+              familyTitle={t[`families.${family}.title`]}
+              learnMore={t['learnMore']}
+            />
+          ))}
+      </div>
+    </section>
+  ))}
 </BaseLayout>

@@ -1,11 +1,34 @@
 ---
-import { localizedPath, siteCopy, type Locale, type Product } from '../content/site';
-const { product, locale } = Astro.props as { product: Product; locale: Locale };
-const family = siteCopy[locale].families[product.family];
+import { localizedPath } from '../content/site';
+import ProductImage from './ProductImage.astro';
+import type { PBProduct } from '../lib/content';
+import type { Locale } from '../content/site';
+
+interface Props {
+  product: PBProduct;
+  locale: Locale;
+  familyTitle: string;
+  learnMore: string;
+}
+
+const { product, locale, familyTitle, learnMore } = Astro.props;
+const linkLabel = `${learnMore}: ${product.title}`;
 ---
-<article class="product-card">
-  <p class="eyebrow">{family.title}</p>
-  <h3>{product.title}</h3>
-  <p>{product.summary}</p>
-  <a href={localizedPath(locale, `products/${product.family}/${product.slug}`)}>{siteCopy[locale].learnMore} <span aria-hidden="true">→</span></a>
+<article
+  class="group relative flex flex-col min-h-[300px] overflow-hidden border border-line rounded-xl bg-white shadow-[0_8px_20px_rgb(28_25_48/5%)] transition-[border-color,box-shadow,transform] duration-200 ease-quint hover:border-violet/35 hover:shadow-[0_16px_30px_rgb(28_25_48/11%)] hover:-translate-y-1"
+>
+  <div class="relative aspect-[16/10] overflow-hidden bg-mist">
+    <ProductImage product={product} imgClass="transition-transform duration-500 ease-quint group-hover:scale-105" />
+    <span aria-hidden="true" class="absolute top-0 right-[1.35rem] w-10 h-1 bg-orange transition-[width] duration-200 ease-quint group-hover:w-[4.25rem]"></span>
+  </div>
+  <div class="flex flex-col flex-1 p-[clamp(1.5rem,3vw,2.1rem)]">
+    <p class="eyebrow text-orange">{familyTitle}</p>
+    <h3 class="m-0 mb-[0.8rem] text-[clamp(1.3rem,2.1vw,1.75rem)] tracking-[-0.04em] leading-[1.2]">{product.title}</h3>
+    <p class="m-0 text-muted">{product.summary}</p>
+    <a
+      href={localizedPath(locale, `products/${product.family}/${product.slug}`)}
+      aria-label={linkLabel}
+      class="inline-flex items-center gap-[0.45rem] min-h-11 mt-auto pt-5 text-violet text-[0.9rem] font-extrabold no-underline"
+    >{learnMore} <span aria-hidden="true" class="transition-transform duration-200 ease-quint group-hover:translate-x-1">→</span></a>
+  </div>
 </article>

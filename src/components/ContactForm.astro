@@ -1,8 +1,31 @@
 ---
-import { siteCopy, type Locale } from '../content/site';
-const { locale } = Astro.props as { locale: Locale };
-const copy = siteCopy[locale].contact;
-const errorCopy = locale === 'it' ? { name: 'Inserisci il tuo nome.', email: 'Inserisci un’email valida.', message: 'Il messaggio deve contenere almeno 12 caratteri.' } : { name: 'Please enter your name.', email: 'Please enter a valid email address.', message: 'Your message must contain at least 12 characters.' };
+interface Props {
+  locale: string;
+  copy: {
+    firstName: string;
+    lastName: string;
+    firstNamePlaceholder: string;
+    lastNamePlaceholder: string;
+    email: string;
+    emailPlaceholder: string;
+    company: string;
+    companyPlaceholder: string;
+    message: string;
+    messagePlaceholder: string;
+    messageCounter: string;
+    send: string;
+    success: string;
+    failure: string;
+  };
+  errorCopy: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    message: string;
+  };
+}
+
+const { locale, copy, errorCopy } = Astro.props;
 ---
 <form
   data-testid="contact-form"
@@ -10,59 +33,105 @@ const errorCopy = locale === 'it' ? { name: 'Inserisci il tuo nome.', email: 'In
   data-locale={locale}
   data-success={copy.success}
   data-failure={copy.failure}
-  data-error-name={errorCopy.name}
+  data-error-first-name={errorCopy.firstName}
+  data-error-last-name={errorCopy.lastName}
   data-error-email={errorCopy.email}
   data-error-message={errorCopy.message}
+  data-message-counter={copy.messageCounter}
   novalidate
 >
+  <p class="form-legend">
+    <span aria-hidden="true" class="required-mark">*</span>{locale === 'it' ? ' campo obbligatorio' : ' required field'}
+  </p>
   <div class="form-grid">
-    <label>{copy.name}<input name="name" autocomplete="name" required minlength="2" /></label>
-    <label>{copy.email}<input name="email" type="email" autocomplete="email" required /></label>
-    <label>{copy.company}<input name="company" autocomplete="organization" /></label>
+    <label class="form-field">
+      <span class="form-label">{copy.firstName}<span class="required-mark" aria-label="required"> *</span></span>
+      <input name="first_name" autocomplete="given-name" required minlength="2" placeholder={copy.firstNamePlaceholder} />
+    </label>
+    <label class="form-field">
+      <span class="form-label">{copy.lastName}<span class="required-mark" aria-label="required"> *</span></span>
+      <input name="last_name" autocomplete="family-name" required minlength="2" placeholder={copy.lastNamePlaceholder} />
+    </label>
+    <label class="form-field">
+      <span class="form-label">{copy.email}<span class="required-mark" aria-label="required"> *</span></span>
+      <input name="email" type="email" autocomplete="email" required placeholder={copy.emailPlaceholder} />
+    </label>
+    <label class="form-field">
+      <span class="form-label">
+        {copy.company}
+        <span class="form-optional">{locale === 'it' ? 'opzionale' : 'optional'}</span>
+      </span>
+      <input name="company" autocomplete="organization" placeholder={copy.companyPlaceholder} />
+    </label>
     <label class="honeypot" aria-hidden="true">Website<input name="website" tabindex="-1" autocomplete="off" /></label>
   </div>
-  <label>{copy.message}<textarea name="message" required minlength="12" maxlength="2000"></textarea></label>
+  <div class="form-field form-field--full">
+    <label class="form-label" for="contact-message">{copy.message}<span class="required-mark" aria-label="required"> *</span></label>
+    <textarea id="contact-message" name="message" required minlength="12" maxlength="2000" placeholder={copy.messagePlaceholder}></textarea>
+    <div class="char-counter">0 {copy.messageCounter}</div>
+  </div>
   <p class="form-status" role="status" aria-live="polite"></p>
-  <button type="submit">{copy.send}</button>
+  <button type="submit" class="btn btn-primary">{copy.send}</button>
 </form>
 <script>
   import { contactEndpoint, validateContact } from '../lib/contact';
   const form = document.querySelector<HTMLFormElement>('[data-testid="contact-form"]');
   const status = form?.querySelector<HTMLElement>('.form-status');
-  const errorCopy = {
-    name: form?.dataset.errorName ?? '',
-    email: form?.dataset.errorEmail ?? '',
-    message: form?.dataset.errorMessage ?? ''
-  };
+  const textarea = form?.querySelector<HTMLTextAreaElement>('textarea[name="message"]');
+  const counter = form?.querySelector<HTMLElement>('.char-counter');
+
+  if (textarea && counter && form) {
+    const messageCounter = form.dataset.messageCounter ?? '/ 2000';
+    textarea.addEventListener('input', () => {
+      counter.textContent = textarea.value.length + ' ' + messageCounter;
+    });
+    counter.textContent = textarea.value.length + ' ' + messageCounter;
+  }
 
   form?.addEventListener('submit', async (event: SubmitEvent) => {
     event.preventDefault();
     const submittedValues = Object.fromEntries(new FormData(form).entries());
-    const payload = {
-      name: String(submittedValues.name ?? ''),
-      email: String(submittedValues.email ?? ''),
-      company: String(submittedValues.company ?? ''),
-      message: String(submittedValues.message ?? ''),
-      website: String(submittedValues.website ?? ''),
-      locale: form.dataset.locale ?? 'it'
+    const firstName = String(submittedValues.first_name ?? '');
+    const lastName = String(submittedValues.last_name ?? '');
+    const email = String(submittedValues.email ?? '');
+    const company = String(submittedValues.company ?? '');
+    const message = String(submittedValues.message ?? '');
+    const website = String(submittedValues.website ?? '');
+
+    const errorCopy = {
+      first_name: form.dataset.errorFirstName ?? '',
+      last_name: form.dataset.errorLastName ?? '',
+      email: form.dataset.errorEmail ?? '',
+      message: form.dataset.errorMessage ?? ''
     };
-    const check = validateContact(payload);
+
+    // Clear previous errors
     form.querySelectorAll<HTMLElement>('[aria-describedby], [aria-invalid]').forEach((input) => {
       input.removeAttribute('aria-describedby');
       input.removeAttribute('aria-invalid');
     });
     form.querySelectorAll<HTMLElement>('[data-error]').forEach((node) => node.remove());
-    if (!check.valid) {
+
+    // Validate: run shared validator on synthetic payload, plus individual name field checks
+    const combinedName = (firstName + ' ' + lastName).trim();
+    const check = validateContact({ name: combinedName, email, message, website });
+
+    const fieldErrors: Record<string, string> = {};
+    if (firstName.trim().length < 2) fieldErrors.first_name = errorCopy.first_name;
+    if (lastName.trim().length < 2) fieldErrors.last_name = errorCopy.last_name;
+    if (check.errors.email) fieldErrors.email = errorCopy.email;
+    if (check.errors.message) fieldErrors.message = errorCopy.message;
+
+    if (Object.keys(fieldErrors).length > 0) {
       let firstInvalidField: HTMLInputElement | HTMLTextAreaElement | undefined;
-      Object.keys(check.errors).forEach((field) => {
-        if (field === 'website') return;
+      Object.entries(fieldErrors).forEach(([field, msg]) => {
         const input = form.elements.namedItem(field);
         if (!(input instanceof HTMLInputElement || input instanceof HTMLTextAreaElement)) return;
         const error = document.createElement('span');
         error.id = `error-${field}`;
         error.dataset.error = field;
         error.className = 'field-error';
-        error.textContent = errorCopy[field as keyof typeof errorCopy];
+        error.textContent = msg;
         input.after(error);
         input.setAttribute('aria-describedby', `error-${field}`);
         input.setAttribute('aria-invalid', 'true');
@@ -72,16 +141,141 @@ const errorCopy = locale === 'it' ? { name: 'Inserisci il tuo nome.', email: 'In
       if (status) status.textContent = '';
       return;
     }
+
     const button = form.querySelector<HTMLButtonElement>('button[type="submit"], button:not([type])');
     if (!button) return;
     button.disabled = true;
+
+    const payload = {
+      name: combinedName,
+      email,
+      company,
+      message,
+      website,
+      locale: form.dataset.locale ?? 'it'
+    };
+
     try {
-      const response = await fetch(contactEndpoint(import.meta.env.PUBLIC_API_URL), { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(payload) });
+      const response = await fetch(contactEndpoint(import.meta.env.PUBLIC_API_URL), {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
       if (!response.ok) throw new Error('request failed');
       form.reset();
+      if (counter && form.dataset.messageCounter) {
+        counter.textContent = '0 ' + form.dataset.messageCounter;
+      }
       if (status) status.textContent = form.dataset.success ?? '';
     } catch {
       if (status) status.textContent = form.dataset.failure ?? '';
-    } finally { button.disabled = false; }
+    } finally {
+      button.disabled = false;
+    }
   });
 </script>
+
+<style>
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .form-field--full {
+    margin-top: 1rem;
+  }
+
+  .form-legend {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin: 0 0 1.25rem;
+  }
+
+  .form-label {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .required-mark {
+    color: var(--violet);
+    font-weight: 800;
+  }
+
+  .form-optional {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--muted);
+    background: var(--mist);
+    padding: 0.1rem 0.4rem;
+    border-radius: 4px;
+    margin-left: 0.2rem;
+  }
+
+  .char-counter {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-align: right;
+    margin-top: 0.25rem;
+  }
+
+  .contact-form input,
+  .contact-form textarea {
+    width: 100%;
+    padding: 0.65rem 0.85rem;
+    border: 1.5px solid var(--line);
+    border-radius: 8px;
+    font: inherit;
+    font-size: 0.9rem;
+    background: var(--paper);
+    color: var(--ink);
+    transition: border-color 150ms;
+  }
+
+  .contact-form input:focus,
+  .contact-form textarea:focus {
+    border-color: var(--violet);
+    outline: none;
+  }
+
+  .contact-form textarea {
+    resize: vertical;
+    min-height: 140px;
+  }
+
+  .contact-form button[type="submit"] {
+    width: 100%;
+    margin-top: 1.25rem;
+  }
+
+  .form-status {
+    min-height: 1.5em;
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin: 0.75rem 0 0;
+  }
+
+  .field-error {
+    font-size: 0.78rem;
+    color: var(--orange-text, #a83f1b);
+    font-weight: 600;
+  }
+
+  .honeypot {
+    position: absolute !important;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(1px, 1px, 1px, 1px);
+  }
+
+  @media (max-width: 540px) {
+    .form-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

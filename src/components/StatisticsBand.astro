@@ -2,10 +2,38 @@
 import type { HomeCopy } from '../content/site';
 
 const { statistics, label } = Astro.props as { statistics: HomeCopy['statistics']; label: string };
+
+// Split a stat value like "94%", "3x", "500+" into { prefix, num, suffix }
+// so the numeric part can count up while the affix stays put.
+function splitStat(value: string) {
+  const m = String(value).match(/^(\D*)(\d+(?:\.\d+)?)(.*)$/);
+  if (!m) return { animate: false, prefix: '', num: value, suffix: '' };
+  return { animate: true, prefix: m[1], num: m[2], suffix: m[3] };
+}
 ---
 
-<section class="statistics-band" aria-label={label}>
-  <div>
-    {statistics.map((statistic) => <p><strong>{statistic.value}</strong><span>{statistic.label}</span></p>)}
+<section class="bg-orange" aria-label={label}>
+  <div
+    class="grid grid-cols-1 md:grid-cols-3 max-w-[1200px] mx-auto px-[clamp(1.25rem,4vw,3rem)]"
+    data-reveal-stagger
+  >
+    {statistics.map((statistic) => {
+      const s = splitStat(statistic.value);
+      return (
+        <p class="grid gap-1 content-center m-0 py-[1.4rem] px-0 border-t border-white/25 first:border-t-0 md:min-h-[150px] md:py-9 md:px-[clamp(1rem,3vw,3rem)] md:border-t-0 md:border-l md:first:border-l-0">
+          {s.animate ? (
+            <strong
+              class="text-white text-[clamp(2.25rem,4vw,3.65rem)] tracking-[-0.07em] leading-none tabular-nums"
+              data-count-to={s.num}
+              data-count-prefix={s.prefix}
+              data-count-suffix={s.suffix}
+            >{s.prefix}0{s.suffix}</strong>
+          ) : (
+            <strong class="text-white text-[clamp(2.25rem,4vw,3.65rem)] tracking-[-0.07em] leading-none">{statistic.value}</strong>
+          )}
+          <span class="max-w-[17ch] text-white/80 text-[0.82rem] font-bold">{statistic.label}</span>
+        </p>
+      );
+    })}
   </div>
 </section>

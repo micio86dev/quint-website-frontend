@@ -7,6 +7,8 @@ COPY . .
 EXPOSE 4321
 CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]
 FROM dependencies AS build
+ARG SITE_URL
+ENV SITE_URL=${SITE_URL}
 COPY . .
 RUN npm run build
 FROM nginx:1.27-alpine AS production

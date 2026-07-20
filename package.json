@@ -12,7 +12,7 @@
     "preview": "astro preview",
     "test": "vitest run --coverage",
     "test:watch": "vitest",
-    "test:production": "node --test tests/production/homepage-contract.test.mjs",
+    "test:production": "node --test tests/unit/site-origin.test.mjs tests/production/homepage-contract.test.mjs",
     "test:e2e": "playwright test",
     "test:e2e:update": "playwright test --update-snapshots"
   },
@@ -23,7 +23,9 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
     "@playwright/test": "^1.54.0",
+    "@tailwindcss/vite": "^4.3.3",
     "@vitest/coverage-v8": "^3.2.4",
+    "tailwindcss": "^4.3.3",
     "typescript": "^5.8.3",
     "vitest": "^3.2.4"
   }

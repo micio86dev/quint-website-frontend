@@ -1,20 +1,22 @@
 ---
-import { getLocale, localizedPath, siteCopy, type Locale } from '../content/site';
-import '../styles/global.css';
+import { getLocale, localizedPath, type Locale } from '../content/site';
+import { getSiteText } from '../lib/content';
+import '../styles/app.css';
 const { locale: candidate, title, description, path = '' } = Astro.props as { locale: Locale; title: string; description: string; path?: string };
 const locale = getLocale(candidate);
-const copy = siteCopy[locale];
+const t = await getSiteText(locale);
 const canonical = new URL(localizedPath(locale, path), Astro.site);
 const alternate = locale === 'it' ? 'en' : 'it';
-const primaryNavigationLabel = locale === 'it' ? 'Navigazione principale' : 'Primary navigation';
 const production = import.meta.env.PROD;
+const pageTitle = title === 'Quint' ? 'Quint' : `${title} | Quint`;
+const currentYear = new Date().getFullYear();
 ---
 <!doctype html>
 <html lang={locale}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{title} | Quint</title>
+    <title>{pageTitle}</title>
     <meta name="description" content={description} />
     <meta name="robots" content={production ? 'index,follow' : 'noindex,nofollow'} />
     <link rel="canonical" href={canonical} />
@@ -22,19 +24,349 @@ const production = import.meta.env.PROD;
     <link rel="alternate" hreflang={alternate} href={new URL(localizedPath(alternate, path), Astro.site)} />
     <link rel="alternate" hreflang="x-default" href={new URL(localizedPath('it', path), Astro.site)} />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content={`${title} | Quint`} />
+    <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
     <meta name="theme-color" content="#771AAF" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
-    <script type="application/ld+json" set:html={JSON.stringify({ '@context': 'https://schema.org', '@type': 'Organization', name: 'Quint', url: Astro.site?.toString(), description: copy.brandStatement })} />
+    <script is:inline type="application/ld+json" set:html={JSON.stringify({ '@context': 'https://schema.org', '@type': 'Organization', name: 'Quint', url: Astro.site?.toString(), description: t['brandStatement'] })} />
   </head>
   <body>
-    <a class="skip-link" href="#content">{locale === 'it' ? 'Vai al contenuto' : 'Skip to content'}</a>
-    <header class="site-header"><a class="brand" href={localizedPath(locale)} aria-label="Quint home">QUINT<span aria-hidden="true">●</span></a><nav aria-label={primaryNavigationLabel}><a href={localizedPath(locale)}>{copy.nav.home}</a><a href={localizedPath(locale, 'products')}>{copy.nav.products}</a><a href={localizedPath(locale, 'contact')}>{copy.nav.contact}</a></nav><a class="language-link" href={localizedPath(alternate, path)} lang={alternate}>{copy.languageName}</a></header>
+    <a class="skip-link" href="#content">{t['skipLink']}</a>
+    <header class="sticky top-0 z-[5] bg-[rgb(255_253_250/96%)] border-b border-line">
+      <div class="flex items-center justify-between gap-6 max-w-[1200px] mx-auto min-h-[72px] px-[clamp(1.25rem,4vw,3rem)] py-[1.1rem]">
+        <a class="flex-none inline-flex items-center min-h-11 text-ink text-[1.45rem] font-extrabold tracking-[0.08em] no-underline" href={localizedPath(locale)} aria-label={t['nav.brandHome']}>
+          <img src="/quint-logo.png" alt="Quint" width="130" height="40" />
+        </a>
+        <nav class="hidden min-[761px]:flex items-center gap-[clamp(0.3rem,1.8vw,1.1rem)] ml-auto" aria-label={t['nav.primaryLabel']}>
+          <a class="inline-flex items-center min-h-11 px-[0.55rem] py-[0.45rem] text-[0.9rem] font-bold no-underline transition-colors duration-[180ms] ease-quint hover:bg-mist hover:text-violet" href={localizedPath(locale)}>{t['nav.home']}</a>
+          <a class="inline-flex items-center min-h-11 px-[0.55rem] py-[0.45rem] text-[0.9rem] font-bold no-underline transition-colors duration-[180ms] ease-quint hover:bg-mist hover:text-violet" href={localizedPath(locale, 'products')}>{t['nav.products']}</a>
+          <a class="inline-flex items-center min-h-11 px-[0.55rem] py-[0.45rem] text-[0.9rem] font-bold no-underline transition-colors duration-[180ms] ease-quint hover:bg-mist hover:text-violet" href={localizedPath(locale, 'contact')}>{t['nav.contact']}</a>
+        </nav>
+        <a class="hidden min-[761px]:inline-flex items-center min-h-11 ml-[clamp(0.25rem,1.5vw,0.8rem)] px-[0.55rem] py-[0.45rem] text-[0.9rem] font-bold text-violet no-underline transition-colors duration-[180ms] ease-quint hover:bg-mist" href={localizedPath(alternate, path)} lang={alternate}>{t['languageName']}</a>
+        <button
+          class="nav-toggle"
+          aria-expanded="false"
+          aria-controls="mobile-nav"
+          aria-label={t['nav.menuOpen']}
+          data-label-open={t['nav.menuOpen']}
+          data-label-close={t['nav.menuClose']}
+        >
+          <span class="nav-toggle__bar" aria-hidden="true"></span>
+        </button>
+      </div>
+    </header>
+    <div class="mobile-nav" id="mobile-nav" aria-hidden="true" aria-label={t['nav.primaryLabel']}>
+      <button class="mobile-nav__close" id="mobile-nav-close" type="button" aria-label={t['nav.menuClose']}>
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+          <line x1="4" y1="4" x2="16" y2="16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+          <line x1="16" y1="4" x2="4" y2="16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <nav>
+        <a href={localizedPath(locale)}>{t['nav.home']}</a>
+        <a href={localizedPath(locale, 'products')}>{t['nav.products']}</a>
+        <a href={localizedPath(locale, 'contact')}>{t['nav.contact']}</a>
+        <a class="mobile-nav__lang" href={localizedPath(alternate, path)} lang={alternate}>{t['languageName']}</a>
+      </nav>
+    </div>
     <main id="content"><slot /></main>
-    <footer class="site-footer"><p><strong>QUINT</strong> — {copy.footer}</p><a href={localizedPath(locale, 'contact')}>{copy.nav.contact}</a></footer>
+    <div
+      class="cookie-bar"
+      id="cookie-bar"
+      role="region"
+      aria-label={t['cookie.barLabel']}
+      hidden
+    >
+      <p>{t['cookie.barText']} <a href={localizedPath(locale, 'legal/cookie')}>{t['cookie.barLink']}</a>.</p>
+      <button id="cookie-accept" type="button">{t['cookie.barAccept']}</button>
+    </div>
+    <footer class="border-t border-line">
+      <div class="flex flex-col items-start gap-3 md:flex-row md:items-center md:justify-between max-w-[1200px] mx-auto px-[clamp(1.25rem,4vw,3rem)] py-[1.1rem] text-muted text-[0.9rem]">
+        <p class="m-0"><strong class="text-violet">QUINT</strong> — {t['footer']}</p>
+        <nav aria-label={t['nav.legalLabel']} class="flex flex-wrap items-center gap-x-[0.8rem] gap-y-1">
+          <a class="min-h-11 inline-flex items-center font-extrabold no-underline text-violet transition-colors duration-[180ms] hover:text-violet-dark" href={localizedPath(locale, 'legal/privacy')}>{t['nav.privacy']}</a>
+          <a class="min-h-11 inline-flex items-center font-extrabold no-underline text-violet transition-colors duration-[180ms] hover:text-violet-dark" href={localizedPath(locale, 'legal/cookie')}>{t['nav.cookie']}</a>
+          <a class="min-h-11 inline-flex items-center font-extrabold no-underline text-violet transition-colors duration-[180ms] hover:text-violet-dark" href={localizedPath(locale, 'legal/terms')}>{t['nav.terms']}</a>
+          <a class="min-h-11 inline-flex items-center font-extrabold no-underline text-violet transition-colors duration-[180ms] hover:text-violet-dark" href={localizedPath(locale, 'contact')}>{t['nav.contact']}</a>
+        </nav>
+      </div>
+      <div class="border-t border-line">
+        <p class="max-w-[1200px] mx-auto px-[clamp(1.25rem,4vw,3rem)] py-5 m-0 text-center text-[0.78rem] text-muted">© {currentYear} Quint S.r.l. — {t['footer.copyright'] || (locale === 'it' ? 'Tutti i diritti riservati.' : 'All rights reserved.')}</p>
+      </div>
+    </footer>
+    <script is:inline>
+      const toggle = document.querySelector('.nav-toggle');
+      const mobileNav = document.getElementById('mobile-nav');
+
+      function openMenu() {
+        toggle.setAttribute('aria-expanded', 'true');
+        mobileNav.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        toggle.setAttribute('aria-label', toggle.dataset.labelClose ?? '');
+      }
+
+      function closeMenu() {
+        toggle.setAttribute('aria-expanded', 'false');
+        mobileNav.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+        toggle.setAttribute('aria-label', toggle.dataset.labelOpen ?? '');
+      }
+
+      toggle?.addEventListener('click', () => {
+        toggle.getAttribute('aria-expanded') === 'true' ? closeMenu() : openMenu();
+      });
+
+      document.getElementById('mobile-nav-close')?.addEventListener('click', closeMenu);
+      mobileNav?.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+      document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+
+      // Cookie bar
+      const cookieBar = document.getElementById('cookie-bar');
+      const cookieAccept = document.getElementById('cookie-accept');
+      if (cookieBar && !localStorage.getItem('quint-cookies-ok')) {
+        cookieBar.removeAttribute('hidden');
+      }
+      cookieAccept?.addEventListener('click', () => {
+        localStorage.setItem('quint-cookies-ok', '1');
+        if (cookieBar) {
+          cookieBar.style.transform = 'translateY(100%)';
+          cookieBar.style.opacity = '0';
+          setTimeout(() => cookieBar.setAttribute('hidden', ''), 350);
+        }
+      });
+
+      // ── Scroll reveal + count-up ──────────────────────────────
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      // Assign stagger index to children of [data-reveal-stagger]
+      document.querySelectorAll('[data-reveal-stagger]').forEach((group) => {
+        Array.from(group.children).forEach((child, i) => {
+          child.style.setProperty('--i', String(i));
+        });
+      });
+
+      // Count-up: animate [data-count-to] from 0 to target on reveal
+      function runCountUp(el) {
+        const raw = el.getAttribute('data-count-to') || '';
+        const target = parseFloat(raw.replace(/[^0-9.]/g, ''));
+        if (!isFinite(target)) return;
+        const prefix = el.getAttribute('data-count-prefix') || '';
+        const suffix = el.getAttribute('data-count-suffix') || '';
+        const decimals = (raw.split('.')[1] || '').length;
+        if (reduceMotion) { el.textContent = prefix + raw.replace(/[^0-9.]/g, '') + suffix; return; }
+        const duration = 1500;
+        let startTime = null;
+        function frame(now) {
+          if (startTime === null) startTime = now;
+          const p = Math.min((now - startTime) / duration, 1);
+          const eased = 1 - Math.pow(1 - p, 3); // easeOutCubic
+          const val = (target * eased).toFixed(decimals);
+          el.textContent = prefix + val + suffix;
+          if (p < 1) requestAnimationFrame(frame);
+          else el.textContent = prefix + target.toFixed(decimals) + suffix;
+        }
+        requestAnimationFrame(frame);
+      }
+
+      const revealEls = document.querySelectorAll('[data-reveal], [data-reveal-stagger]');
+      function revealEl(el) {
+        el.classList.add('is-visible');
+        el.querySelectorAll?.('[data-count-to]').forEach(runCountUp);
+        if (el.hasAttribute && el.hasAttribute('data-count-to')) runCountUp(el);
+      }
+      function revealAll() { revealEls.forEach(revealEl); }
+
+      try {
+        if (reduceMotion || !('IntersectionObserver' in window)) {
+          revealAll();
+        } else {
+          const io = new IntersectionObserver((entries, obs) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) return;
+              revealEl(entry.target);
+              obs.unobserve(entry.target);
+            });
+          }, { threshold: 0, rootMargin: '0px 0px -64px 0px' });
+          revealEls.forEach((el) => io.observe(el));
+          // Fail-safe: nothing must ever stay permanently invisible
+          setTimeout(revealAll, 3500);
+        }
+      } catch (_) {
+        revealAll();
+      }
+    </script>
+    <style>
+      /* Site shell — self-contained (uses @theme tokens via the app.css bridge).
+         Header/footer are utility-driven in markup; the interactive widgets
+         (hamburger, mobile overlay, cookie bar) stay as scoped CSS. */
+      .skip-link {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+        position: absolute;
+        z-index: 10;
+        top: -4rem;
+        left: 1rem;
+        padding: 0.7rem 1rem;
+        background: var(--color-ink);
+        color: #fff;
+      }
+      .skip-link:focus { top: 1rem; }
+
+      /* Hamburger toggle */
+      .nav-toggle {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        margin-left: 0.5rem;
+        padding: 0;
+        background: transparent;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        flex-shrink: 0;
+      }
+      .nav-toggle:hover { background: var(--color-mist); }
+      .nav-toggle__bar,
+      .nav-toggle__bar::before,
+      .nav-toggle__bar::after {
+        display: block;
+        width: 22px;
+        height: 2px;
+        background: var(--color-ink);
+        border-radius: 2px;
+        transition: transform 300ms var(--ease-quint), opacity 200ms ease, background-color 200ms;
+      }
+      .nav-toggle__bar { position: relative; }
+      .nav-toggle__bar::before,
+      .nav-toggle__bar::after { position: absolute; left: 0; content: ''; }
+      .nav-toggle__bar::before { top: -7px; }
+      .nav-toggle__bar::after  { top: 7px; }
+      .nav-toggle[aria-expanded="true"] .nav-toggle__bar { background: transparent; }
+      .nav-toggle[aria-expanded="true"] .nav-toggle__bar::before { transform: translateY(7px) rotate(45deg); }
+      .nav-toggle[aria-expanded="true"] .nav-toggle__bar::after { transform: translateY(-7px) rotate(-45deg); }
+
+      /* Mobile nav overlay */
+      .mobile-nav {
+        position: fixed;
+        inset: 0;
+        z-index: 99;
+        display: flex;
+        flex-direction: column;
+        background: var(--color-ink);
+        opacity: 0;
+        transform: translateY(-12px);
+        pointer-events: none;
+        transition: opacity 280ms var(--ease-quint), transform 300ms var(--ease-quint);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      .mobile-nav__close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        background: rgb(255 255 255 / 10%);
+        border: 1px solid rgb(255 255 255 / 15%);
+        border-radius: 10px;
+        color: #fff;
+        cursor: pointer;
+        padding: 0;
+        flex-shrink: 0;
+        transition: background 150ms;
+      }
+      .mobile-nav__close:hover { background: rgb(255 255 255 / 20%); }
+      .mobile-nav[aria-hidden="false"] { opacity: 1; transform: translateY(0); pointer-events: auto; }
+      .mobile-nav nav {
+        display: flex;
+        flex-direction: column;
+        padding: clamp(5rem, 12vw, 7rem) clamp(1.25rem, 6vw, 3rem) clamp(1.5rem, 6vw, 3rem);
+      }
+      .mobile-nav nav a {
+        display: flex;
+        align-items: center;
+        min-height: 68px;
+        border-bottom: 1px solid rgb(255 255 255 / 10%);
+        color: #fff;
+        font-size: clamp(1.3rem, 5vw, 1.6rem);
+        font-weight: 700;
+        letter-spacing: -0.025em;
+        text-decoration: none;
+        opacity: 0;
+        transform: translateX(-18px);
+      }
+      .mobile-nav[aria-hidden="false"] nav a { animation: mobile-link-in 350ms var(--ease-quint) both; }
+      .mobile-nav[aria-hidden="false"] nav a:nth-child(1) { animation-delay: 40ms; }
+      .mobile-nav[aria-hidden="false"] nav a:nth-child(2) { animation-delay: 90ms; }
+      .mobile-nav[aria-hidden="false"] nav a:nth-child(3) { animation-delay: 140ms; }
+      .mobile-nav[aria-hidden="false"] nav a:nth-child(4) { animation-delay: 190ms; }
+      @keyframes mobile-link-in {
+        from { opacity: 0; transform: translateX(-18px); }
+        to   { opacity: 1; transform: translateX(0); }
+      }
+      .mobile-nav nav a:hover,
+      .mobile-nav nav a:focus-visible { color: var(--color-orange); outline: none; }
+      .mobile-nav__lang {
+        margin-top: 2rem;
+        border-bottom: none !important;
+        font-size: 1rem !important;
+        color: rgb(255 255 255 / 60%) !important;
+        font-weight: 600 !important;
+      }
+
+      /* Cookie bar */
+      .cookie-bar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 0.75rem 1.5rem;
+        padding: 1rem clamp(1.25rem, 4vw, 3rem);
+        background: var(--color-ink);
+        color: rgb(255 255 255 / 88%);
+        font-size: 0.875rem;
+        transition: transform 350ms var(--ease-quint), opacity 300ms ease;
+      }
+      .cookie-bar[hidden] { display: none; }
+      .cookie-bar p { margin: 0; flex: 1; min-width: 200px; line-height: 1.5; }
+      .cookie-bar a { color: var(--color-orange); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
+      .cookie-bar a:hover { color: #fff; }
+      .cookie-bar button {
+        flex: none;
+        min-height: 38px;
+        padding: 0.45rem 1.15rem;
+        background: var(--color-orange);
+        border: 2px solid var(--color-orange);
+        border-radius: 6px;
+        color: #fff;
+        font-size: 0.85rem;
+        font-weight: 800;
+        cursor: pointer;
+        transition: background 180ms, border-color 180ms;
+      }
+      .cookie-bar button:hover { background: var(--color-orange-dark); border-color: var(--color-orange-dark); }
+
+      @media (max-width: 760px) {
+        .nav-toggle { display: inline-flex; }
+      }
+    </style>
   </body>
 </html>

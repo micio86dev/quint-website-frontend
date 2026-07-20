@@ -1,0 +1,43 @@
+---
+import { getImageUrl } from '../lib/content';
+import type { PBProduct } from '../lib/content';
+
+interface Props {
+  product: PBProduct;
+  /** Passed to the <img>/placeholder for hover effects etc. */
+  imgClass?: string;
+  /** Alt text override; defaults to the product title. */
+  alt?: string;
+  eager?: boolean;
+}
+
+const { product, imgClass = '', alt, eager = false } = Astro.props as Props;
+const imageUrl = product.image ? getImageUrl(product.collectionId, product.id, product.image) : null;
+const initial = (product.title || '?').trim().charAt(0).toUpperCase();
+const altText = alt ?? product.title;
+---
+
+{imageUrl ? (
+  <img
+    src={imageUrl}
+    alt={altText}
+    loading={eager ? 'eager' : 'lazy'}
+    decoding="async"
+    class={`w-full h-full object-cover ${imgClass}`}
+  />
+) : (
+  <div
+    class={`w-full h-full flex items-center justify-center bg-gradient-to-br from-violet via-violet-dark to-ink ${imgClass}`}
+    role="img"
+    aria-label={altText}
+  >
+    <span
+      class="font-extrabold text-white/15 leading-none select-none text-[clamp(3.5rem,10vw,6rem)] tracking-[-0.05em]"
+      aria-hidden="true"
+    >{initial}</span>
+    <span
+      class="absolute bottom-3 right-4 text-[0.6rem] font-bold uppercase tracking-[0.22em] text-white/40 select-none"
+      aria-hidden="true"
+    >Quint</span>
+  </div>
+)}

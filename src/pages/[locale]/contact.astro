@@ -1,10 +1,156 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ContactForm from '../../components/ContactForm.astro';
-import { getLocale, locales, siteCopy, type Locale } from '../../content/site';
-export function getStaticPaths() { return locales.map((locale: Locale) => ({ params: { locale } })); }
-const locale = getLocale(Astro.params.locale); const copy = siteCopy[locale].contact;
+import { getLocale, locales, localizedPath } from '../../content/site';
+import { getSiteText } from '../../lib/content';
+import type { Locale } from '../../content/site';
+
+export function getStaticPaths() {
+  return locales.map((locale: Locale) => ({ params: { locale } }));
+}
+
+const locale = getLocale(Astro.params.locale);
+const t = await getSiteText(locale);
+
+const contactCopy = {
+  firstName: t['contact.firstName'],
+  lastName: t['contact.lastName'],
+  firstNamePlaceholder: t['contact.firstNamePlaceholder'],
+  lastNamePlaceholder: t['contact.lastNamePlaceholder'],
+  email: t['contact.email'],
+  emailPlaceholder: t['contact.emailPlaceholder'],
+  company: t['contact.company'],
+  companyPlaceholder: t['contact.companyPlaceholder'],
+  message: t['contact.message'],
+  messagePlaceholder: t['contact.messagePlaceholder'],
+  messageCounter: t['contact.messageCounter'],
+  send: t['contact.send'],
+  success: t['contact.success'],
+  failure: t['contact.failure'],
+};
+
+const errorCopy = {
+  firstName: t['contact.errorFirstName'],
+  lastName: t['contact.errorLastName'],
+  email: t['contact.errorEmail'],
+  message: t['contact.errorMessage'],
+};
 ---
-<BaseLayout locale={locale} path="contact" title={copy.title} description={copy.intro}>
-  <section class="contact-page"><div><p class="eyebrow">QUINT / CONTACT</p><h1>{copy.title}</h1><p>{copy.intro}</p></div><ContactForm locale={locale} /></section>
+
+<BaseLayout locale={locale} path="contact" title={t['contact.title']} description={t['contact.intro']}>
+  <div class="contact-layout">
+    <div class="contact-intro">
+      <div class="contact-intro__inner">
+        <p class="eyebrow">QUINT / CONTACT</p>
+        <h1>{t['contact.title']}</h1>
+        <p class="contact-intro__body">{t['contact.intro']}</p>
+        <div class="contact-intro__accent" aria-hidden="true"></div>
+      </div>
+    </div>
+    <div class="contact-form-col">
+      <div class="contact-form-card">
+        <ContactForm locale={locale} copy={contactCopy} errorCopy={errorCopy} />
+      </div>
+    </div>
+  </div>
 </BaseLayout>
+
+<style>
+  .contact-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 8fr);
+    gap: clamp(2rem, 5vw, 5rem);
+    max-width: var(--max);
+    margin: auto;
+    padding: clamp(3rem, 7vw, 7rem) clamp(1.25rem, 4vw, 3rem);
+    align-items: start;
+  }
+
+  .contact-intro {
+    position: sticky;
+    top: calc(72px + 2rem);
+  }
+
+  .contact-intro__inner {
+    padding: clamp(2rem, 3vw, 3rem);
+    background: var(--mist);
+    border-left: 4px solid var(--violet);
+    border-radius: 0 12px 12px 0;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .contact-intro__inner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgb(119 26 175 / 6%) 0%, transparent 60%);
+    pointer-events: none;
+  }
+
+  .contact-intro__inner .eyebrow {
+    position: relative;
+  }
+
+  .contact-intro__inner h1 {
+    margin: 0.2rem 0 1rem;
+    font-size: clamp(2rem, 3.5vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    line-height: 1.05;
+    max-width: 14ch;
+    position: relative;
+  }
+
+  .contact-intro__body {
+    color: var(--muted);
+    font-size: clamp(1rem, 1.3vw, 1.12rem);
+    line-height: 1.65;
+    max-width: 46ch;
+    margin: 0;
+    position: relative;
+  }
+
+  .contact-intro__accent {
+    width: 48px;
+    height: 4px;
+    background: var(--violet);
+    border-radius: 2px;
+    margin-top: 2rem;
+    opacity: 0.4;
+  }
+
+  .contact-form-col {
+    min-width: 0;
+  }
+
+  .contact-form-card {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: clamp(1.5rem, 3vw, 2.5rem);
+    box-shadow: var(--shadow);
+  }
+
+  @media (max-width: 768px) {
+    .contact-layout {
+      grid-template-columns: 1fr;
+      padding-top: 2.5rem;
+      padding-bottom: 3rem;
+    }
+
+    .contact-intro {
+      position: static;
+    }
+
+    .contact-intro__inner {
+      border-radius: 12px;
+      border-left: none;
+      border-top: 4px solid var(--violet);
+    }
+
+    .contact-intro__inner h1 {
+      font-size: clamp(1.8rem, 5vw, 2.4rem);
+    }
+  }
+</style>

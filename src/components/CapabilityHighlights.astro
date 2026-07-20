@@ -4,15 +4,27 @@ import type { HomeCopy } from '../content/site';
 const { copy } = Astro.props as { copy: HomeCopy['capabilities'] };
 ---
 
-<section class="home-section capability-section" aria-labelledby="capability-title">
-  <div class="section-heading section-heading--split">
+<section
+  class="max-w-none bg-ink text-white py-[clamp(4.8rem,9vw,8rem)] px-[max(1.25rem,calc((100vw-1200px)/2+3rem))]"
+  aria-labelledby="capability-title"
+  data-reveal
+>
+  <div class="grid grid-cols-1 gap-6 items-end mb-[clamp(2.2rem,4vw,3.5rem)] md:grid-cols-[minmax(0,1.2fr)_minmax(230px,0.8fr)] md:gap-[clamp(1.5rem,6vw,6rem)]">
     <div>
-      <p class="eyebrow">{copy.eyebrow}</p>
-      <h2 id="capability-title">{copy.title}</h2>
+      <p class="eyebrow text-white/85">{copy.eyebrow}</p>
+      <h2 id="capability-title" class="m-0 max-w-[17ch] font-extrabold tracking-[-0.06em] text-[clamp(2.2rem,4.2vw,4.25rem)] leading-[1.08]">{copy.title}</h2>
     </div>
-    <p>{copy.body}</p>
+    <p class="m-0 text-white/70 text-base">{copy.body}</p>
   </div>
-  <ol class="capability-list">
-    {copy.items.map((item) => <li><span>{item.number}</span><div><h3>{item.title}</h3><p>{item.body}</p></div></li>)}
+  <ol class="grid grid-cols-1 gap-0 m-0 p-0 list-none border-t border-white/25 md:grid-cols-3" data-reveal-stagger>
+    {copy.items.map((item) => (
+      <li class="grid grid-cols-[auto_1fr] gap-[1.1rem] py-6 border-t border-white/25 first:border-t-0 md:border-t-0 md:py-8 md:pr-[1.6rem] md:pb-6 md:min-h-[210px] md:border-l md:border-white/25 md:first:border-l-0 md:pl-[1.6rem] md:first:pl-0">
+        <span class="text-orange text-[0.75rem] font-extrabold tracking-[0.08em]">{item.number}</span>
+        <div>
+          <h3 class="m-0 mb-[0.55rem] text-[1.15rem] tracking-[-0.025em]">{item.title}</h3>
+          <p class="m-0 text-white/70 text-[0.92rem]">{item.body}</p>
+        </div>
+      </li>
+    ))}
   </ol>
 </section>

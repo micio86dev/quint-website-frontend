@@ -1,10 +1,82 @@
 ---
 import BaseLayout from '../../../../layouts/BaseLayout.astro';
-import { getLocale, getProduct, getProducts, locales, localizedPath, siteCopy, type Locale, type Product } from '../../../../content/site';
-export function getStaticPaths() { return locales.flatMap((locale: Locale) => getProducts(locale).map((product: Product) => ({ params: { locale, family: product.family, slug: product.slug } }))); }
-const locale = getLocale(Astro.params.locale); const product = getProduct(locale, Astro.params.slug ?? ''); const copy = siteCopy[locale];
-if (!product || product.family !== Astro.params.family) return Astro.redirect(localizedPath(locale, 'products'));
+import ProductImage from '../../../../components/ProductImage.astro';
+import { getLocale, locales, localizedPath } from '../../../../content/site';
+import { getSiteText, getProducts, getProduct } from '../../../../lib/content';
+
+export async function getStaticPaths() {
+  const paths = [];
+  for (const locale of locales) {
+    const products = await getProducts(locale);
+    for (const product of products) {
+      paths.push({ params: { locale, family: product.family, slug: product.slug } });
+    }
+  }
+  return paths;
+}
+
+const locale = getLocale(Astro.params.locale);
+const [t, product] = await Promise.all([
+  getSiteText(locale),
+  getProduct(locale, Astro.params.slug ?? ''),
+]);
+
+if (!product || product.family !== Astro.params.family) {
+  return Astro.redirect(localizedPath(locale, 'products'));
+}
+
+const familyTitle = t[`families.${product.family}.title`];
+
+// SEO: structured data for the product
+const productSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: product.title,
+  description: product.summary,
+  category: familyTitle,
+  brand: { '@type': 'Brand', name: 'Quint' },
+};
+
+const proseClasses = [
+  'max-w-[70ch]',
+  '[&_h2]:text-[clamp(1.35rem,2.4vw,1.7rem)] [&_h2]:font-extrabold [&_h2]:tracking-[-0.03em] [&_h2]:mt-10 [&_h2]:mb-3 [&_h2]:text-ink',
+  '[&_h3]:text-[1.05rem] [&_h3]:font-bold [&_h3]:tracking-[-0.02em] [&_h3]:mt-7 [&_h3]:mb-3 [&_h3]:text-ink',
+  '[&_p]:text-muted [&_p]:leading-[1.7] [&_p]:mb-4 [&_p]:max-w-[65ch]',
+  '[&_strong]:text-ink',
+  '[&_ul]:list-none [&_ul]:m-0 [&_ul]:mb-4 [&_ul]:p-0 [&_ul]:grid [&_ul]:gap-2.5',
+  "[&_li]:relative [&_li]:pl-7 [&_li]:text-muted [&_li]:leading-[1.55] [&_li]:before:content-['✦'] [&_li]:before:absolute [&_li]:before:left-0 [&_li]:before:top-0 [&_li]:before:text-orange [&_li]:before:font-bold",
+].join(' ');
 ---
-<BaseLayout locale={locale} path={`products/${product.family}/${product.slug}`} title={product.title} description={product.summary}>
-  <section class="product-hero"><p class="eyebrow">{copy.families[product.family].title}</p><h1>{product.title}</h1><p>{product.summary}</p><div class="product-benefit"><span aria-hidden="true">✦</span><p>{product.benefit}</p></div><a class="button primary" href={localizedPath(locale, 'contact')}>{copy.cta}</a></section>
+
+<BaseLayout
+  locale={locale}
+  path={`products/${product.family}/${product.slug}`}
+  title={product.title}
+  description={product.summary}
+>
+  <section class="bg-mist">
+    <div class="max-w-[1200px] mx-auto px-[clamp(1.25rem,4vw,3rem)] pt-[clamp(4.5rem,10vw,8rem)] pb-[clamp(3.5rem,8vw,6rem)] grid grid-cols-1 gap-[clamp(2.5rem,6vw,5rem)] items-center min-[900px]:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)]">
+      <div data-reveal>
+        <p class="eyebrow text-orange">{familyTitle}</p>
+        <h1 class="m-0 max-w-[13ch] font-extrabold tracking-[-0.06em] text-[clamp(2.6rem,5vw,4.5rem)] leading-[1.04]">{product.title}</h1>
+        <p class="max-w-[52ch] mt-6 text-muted text-[clamp(1.06rem,1.5vw,1.22rem)] leading-[1.6]">{product.summary}</p>
+        <div class="flex items-center gap-4 max-w-[640px] my-8 py-5 px-6 bg-white border border-line border-l-4 border-l-orange rounded-r-lg">
+          <span aria-hidden="true" class="text-orange text-[1.75rem] leading-none">✦</span>
+          <p class="m-0 font-bold text-ink">{product.benefit}</p>
+        </div>
+        <a class="btn btn-primary" href={localizedPath(locale, 'contact')}>{t['cta']}<span aria-hidden="true">→</span></a>
+      </div>
+      <div class="relative aspect-[4/3] rounded-2xl overflow-hidden border border-line shadow-quint" data-reveal>
+        <ProductImage product={product} eager alt={`${product.title} — ${familyTitle}`} />
+      </div>
+    </div>
+  </section>
+
+  {product.description && (
+    <section class="max-w-[1200px] mx-auto px-[clamp(1.25rem,4vw,3rem)] py-[clamp(3.5rem,7vw,6rem)]" aria-label={product.title}>
+      <article class={proseClasses} set:html={product.description} data-reveal />
+    </section>
+  )}
+
+  <script type="application/ld+json" is:inline set:html={JSON.stringify(productSchema)} />
 </BaseLayout>

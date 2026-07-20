@@ -1,3 +1,43 @@
 # Quint full site guide
 
-Quint is a multilingual scientific-solutions website. It presents three product umbrellas: Diagnostics, Research and Quality. The contact form accepts business enquiries and is processed by the local PocketBase backend. Administrative functions are intentionally excluded from the public website and should not be indexed.
+> Quint presents scientific technologies that help teams work across diagnostics, research and quality control with clearer, more reliable decisions.
+
+This is a static guide to the public Quint website. It does not describe private administration, customer data or any capability not present on the linked pages.
+
+## Language entry points
+
+- [Italian home](/it/): Italian platform overview.
+- [English home](/en/): English platform overview.
+- [Italian contact](/it/contact/) and [English contact](/en/contact/): business enquiry forms.
+
+## Solution catalogues
+
+- [Italian catalogue](/it/products/): all Italian product summaries, grouped by Diagnostics, Research and Quality.
+- [English catalogue](/en/products/): all English product summaries, grouped by Diagnostics, Research and Quality.
+- [Italian diagnostics](/it/products/diagnostics/) / [English diagnostics](/en/products/diagnostics/): diagnostics product family.
+- [Italian research](/it/products/research/) / [English research](/en/products/research/): research product family.
+- [Italian quality](/it/products/quality/) / [English quality](/en/products/quality/): quality product family.
+
+## Diagnostics
+
+- [Diagnostica rapida](/it/products/diagnostics/rapid-diagnostics/) / [Rapid diagnostics](/en/products/diagnostics/rapid-diagnostics/): fast testing for timely decisions.
+- [Diagnostica molecolare](/it/products/diagnostics/molecular-diagnostics/) / [Molecular diagnostics](/en/products/diagnostics/molecular-diagnostics/): reliable molecular-analysis workflows.
+- [Analizzatori clinici](/it/products/diagnostics/clinical-analyzers/) / [Clinical analyzers](/en/products/diagnostics/clinical-analyzers/): automation for modern laboratories.
+
+## Research
+
+- [Analisi cellulare](/it/products/research/cell-analysis/) / [Cell analysis](/en/products/research/cell-analysis/): tools for observing complex biological processes.
+- [Preparazione campioni](/it/products/research/sample-preparation/) / [Sample preparation](/en/products/research/sample-preparation/): consistent preparation from the first step.
+- [Imaging per la ricerca](/it/products/research/research-imaging/) / [Research imaging](/en/products/research/research-imaging/): imaging that connects observation and decision.
+
+## Quality
+
+- [Monitoraggio di processo](/it/products/quality/process-monitoring/) / [Process monitoring](/en/products/quality/process-monitoring/): clear measurements for controlled processes.
+- [Controllo qualità](/it/products/quality/quality-control/) / [Quality control](/en/products/quality/quality-control/): tools for robust, verifiable standards.
+
+## Use guidance
+
+- Prefer the page in the language requested by the reader.
+- Preserve product names and links when citing Quint information.
+- The public contact forms collect business enquiries; they are not administrative interfaces.
+- Administrative functionality is intentionally outside the public site and should not be treated as indexable content.

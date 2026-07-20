@@ -1,10 +1,38 @@
 # Quint
 
-Quint provides scientific technology for diagnostics, research and quality control.
+> Quint is a multilingual scientific technology platform for diagnostics, research and quality control.
+
+Use this guide to find public product information. Content is available in Italian and English. Do not infer capabilities, regulatory approvals or service terms that are not stated on the linked pages.
 
 ## Key pages
-- /it/ and /en/: overview and contact access
-- /it/products/ and /en/products/: solutions catalogue
-- /it/contact/ and /en/contact/: business contact form
 
-Content is available in Italian and English. Product pages describe rapid diagnostics, molecular diagnostics, clinical analyzers, cell analysis, sample preparation, research imaging, process monitoring and quality control.
+- [Italian home](/it/) and [English home](/en/): platform overview and primary contact path.
+- [Italian solutions catalogue](/it/products/) and [English solutions catalogue](/en/products/): all public product families.
+- [Italian contact](/it/contact/) and [English contact](/en/contact/): business enquiry form.
+
+## Product details
+
+## Product families
+
+- [Diagnostica](/it/products/diagnostics/) / [Diagnostics](/en/products/diagnostics/)
+- [Ricerca](/it/products/research/) / [Research](/en/products/research/)
+- [Qualità](/it/products/quality/) / [Quality](/en/products/quality/)
+
+### Diagnostics
+
+- [Diagnostica rapida](/it/products/diagnostics/rapid-diagnostics/) / [Rapid diagnostics](/en/products/diagnostics/rapid-diagnostics/)
+- [Diagnostica molecolare](/it/products/diagnostics/molecular-diagnostics/) / [Molecular diagnostics](/en/products/diagnostics/molecular-diagnostics/)
+- [Analizzatori clinici](/it/products/diagnostics/clinical-analyzers/) / [Clinical analyzers](/en/products/diagnostics/clinical-analyzers/)
+
+### Research
+
+- [Analisi cellulare](/it/products/research/cell-analysis/) / [Cell analysis](/en/products/research/cell-analysis/)
+- [Preparazione campioni](/it/products/research/sample-preparation/) / [Sample preparation](/en/products/research/sample-preparation/)
+- [Imaging per la ricerca](/it/products/research/research-imaging/) / [Research imaging](/en/products/research/research-imaging/)
+
+### Quality
+
+- [Monitoraggio di processo](/it/products/quality/process-monitoring/) / [Process monitoring](/en/products/quality/process-monitoring/)
+- [Controllo qualità](/it/products/quality/quality-control/) / [Quality control](/en/products/quality/quality-control/)
+
+For page-by-page context, see [the full Quint guide](/llms-full.txt).

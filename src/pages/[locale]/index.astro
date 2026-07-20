@@ -6,22 +6,94 @@ import Faq from '../../components/Faq.astro';
 import HomeHero from '../../components/HomeHero.astro';
 import ProductShowcase from '../../components/ProductShowcase.astro';
 import StatisticsBand from '../../components/StatisticsBand.astro';
-import { getLocale, getProducts, locales, localizedPath, siteCopy } from '../../content/site';
-export function getStaticPaths() { return locales.map((locale) => ({ params: { locale } })); }
+import { getLocale, locales, localizedPath } from '../../content/site';
+import { getSiteText, getProducts, getFaqs, getCapabilities, getStatistics, getPlatformSignals } from '../../lib/content';
+import type { Locale } from '../../content/site';
+
+export function getStaticPaths() {
+  return locales.map((locale) => ({ params: { locale } }));
+}
+
 const locale = getLocale(Astro.params.locale);
-const copy = siteCopy[locale];
-const products = getProducts(locale);
+
+const [t, products, faqs, capabilities, statistics, platformSignals] = await Promise.all([
+  getSiteText(locale),
+  getProducts(locale),
+  getFaqs(locale),
+  getCapabilities(locale),
+  getStatistics(locale),
+  getPlatformSignals(locale),
+]);
+
+// Build the hero copy shape that HomeHero / PlatformPreview expect
+const homeHeroCopy = {
+  eyebrow: t['home.hero.eyebrow'],
+  title: t['home.hero.title'],
+  body: t['home.hero.body'],
+  platformLabel: t['home.hero.platformLabel'],
+  platformTitle: t['home.hero.platformTitle'],
+  platformDescription: t['home.hero.platformDescription'],
+  platformStatus: t['home.hero.platformStatus'],
+  platformSignals: platformSignals.map((s) => ({ label: s.label, value: s.value })),
+  assurance: t['home.hero.assurance'],
+};
+
+// Build the product section copy
+const homeProductCopy = {
+  eyebrow: t['home.product.eyebrow'],
+  title: t['home.product.title'],
+  body: t['home.product.body'],
+  allProducts: t['home.product.allProducts'],
+};
+
+// Build the capabilities copy - CapabilityHighlights expects {eyebrow, title, body, items: [{number, title, body}]}
+const homeCapabilitiesCopy = {
+  eyebrow: t['home.capabilities.eyebrow'],
+  title: t['home.capabilities.title'],
+  body: t['home.capabilities.body'],
+  items: capabilities.map((c) => ({ number: c.number_label, title: c.title, body: c.body })),
+};
+
+// Build the statistics array - StatisticsBand expects [{value, label}]
+const statisticsData = statistics.map((s) => ({ value: s.value, label: s.label }));
+
+// Build faq array - Faq expects [{question, answer}]
+const faqItems = faqs.map((f) => ({ question: f.question, answer: f.answer }));
 ---
-<BaseLayout locale={locale} title="Quint" description={copy.brandStatement}>
+
+<BaseLayout locale={locale} title="Quint" description={t['brandStatement']}>
   <HomeHero
-    copy={copy.home.hero}
+    copy={homeHeroCopy}
     locale={locale}
-    primaryAction={{ href: localizedPath(locale, 'contact'), label: copy.cta }}
-    secondaryAction={{ href: localizedPath(locale, 'products'), label: copy.secondaryCta }}
+    primaryAction={{ href: localizedPath(locale, 'contact'), label: t['cta'] }}
+    secondaryAction={{ href: localizedPath(locale, 'products'), label: t['secondaryCta'] }}
   />
-  <StatisticsBand statistics={copy.home.statistics} label={copy.home.hero.platformLabel} />
-  <ProductShowcase copy={copy.home.product} products={products.slice(0, 3)} locale={locale} allProductsHref={localizedPath(locale, 'products')} />
-  <CapabilityHighlights copy={copy.home.capabilities} />
-  <Faq eyebrow={copy.home.faqHeading.eyebrow} items={copy.home.faq} title={copy.home.faqHeading.title} />
-  <CtaBlock copy={copy.home.finalCta} href={localizedPath(locale, 'contact')} />
+  <StatisticsBand statistics={statisticsData} label={t['home.hero.platformLabel']} />
+  <ProductShowcase
+    copy={homeProductCopy}
+    products={products.slice(0, 3)}
+    locale={locale}
+    allProductsHref={localizedPath(locale, 'products')}
+    familyTitles={{
+      diagnostics: t['families.diagnostics.title'],
+      research: t['families.research.title'],
+      quality: t['families.quality.title'],
+    }}
+    learnMore={t['learnMore']}
+  />
+  <CapabilityHighlights copy={homeCapabilitiesCopy} />
+  <Faq
+    eyebrow={t['home.faqHeading.eyebrow']}
+    items={faqItems}
+    title={t['home.faqHeading.title']}
+  />
+  <CtaBlock
+    eyebrow={t['home.finalCta.eyebrow']}
+    title={t['home.finalCta.title']}
+    body={t['home.finalCta.body']}
+    action={t['home.finalCta.action']}
+    href={localizedPath(locale, 'contact')}
+    bgColor={t['home.finalCta.bgColor']}
+    textColor={t['home.finalCta.textColor']}
+  />
 </BaseLayout>

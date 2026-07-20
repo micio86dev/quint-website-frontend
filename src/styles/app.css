@@ -1,0 +1,216 @@
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────────────────────
+   Quint design system — Tailwind 4 theme tokens.
+   Colors generate bg-, text- and border- utilities.
+   Also: ease-quint, shadow-quint, max-w-shell, animate-rise-in,
+   animate-mobile-link, animate-wave, animate-pulse-dot.
+   ───────────────────────────────────────────────────────────── */
+@theme {
+  --color-violet: #771AAF;
+  --color-violet-dark: #58137D;
+  --color-orange: #E45526;
+  --color-orange-dark: #C94A1F;
+  --color-ink: #1C1930;
+  --color-paper: #FFFDFA;
+  --color-mist: #F3EFF7;
+  --color-line: #DDD5E4;
+  --color-muted: #625D72;
+
+  --font-sans: 'Open Sans', Arial, sans-serif;
+
+  --ease-quint: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --shadow-quint: 0 24px 52px rgb(28 25 48 / 12%);
+
+  --container-shell: 1200px;
+
+  --animate-rise-in: rise-in 0.6s var(--ease-quint) both;
+  --animate-mobile-link: mobile-link-in 0.35s var(--ease-quint) both;
+  --animate-wave: wave 1.1s ease-in-out infinite;
+  --animate-pulse-dot: pulse-dot 1.6s ease-in-out infinite;
+}
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes mobile-link-in {
+  from { opacity: 0; transform: translateX(-18px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes wave {
+  0%, 100% { transform: scaleY(1);   opacity: 0.7; }
+  50%      { transform: scaleY(1.8); opacity: 1; }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.4; }
+}
+
+/* Token aliases — short names (--violet, --line, ...) mapped to the @theme
+   tokens, used by component-scoped styles (BaseLayout shell, PlatformPreview,
+   ContactForm, contact page, legal.css). */
+:root {
+  --violet: var(--color-violet);
+  --violet-dark: var(--color-violet-dark);
+  --orange: var(--color-orange);
+  --ink: var(--color-ink);
+  --paper: var(--color-paper);
+  --mist: var(--color-mist);
+  --line: var(--color-line);
+  --muted: var(--color-muted);
+  --shadow: var(--shadow-quint);
+  --max: var(--container-shell);
+  --ease-out-quint: var(--ease-quint);
+}
+
+/* Global base: font + smooth scroll + horizontal overflow guard.
+   (Component styling lives in utility classes, not here.) */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    overflow-x: hidden;
+    font-family: var(--font-sans);
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+  }
+
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  summary:focus-visible {
+    outline: 3px solid var(--color-orange);
+    outline-offset: 4px;
+  }
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Reusable primitives — shared across components (.eyebrow, .btn*).
+   ───────────────────────────────────────────────────────────── */
+@layer components {
+  .eyebrow {
+    margin: 0 0 0.8rem;
+    color: var(--color-violet);
+    font-size: 0.74rem;
+    font-weight: 800;
+    letter-spacing: 0.13em;
+    line-height: 1.3;
+    text-transform: uppercase;
+  }
+}
+
+/* Buttons are UNLAYERED so their color/:hover always win over generic
+   link styles, regardless of specificity or layer order. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  min-height: 48px;
+  padding: 0.72rem 1.15rem;
+  border: 2px solid var(--color-violet);
+  border-radius: 8px;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-decoration: none;
+  transition:
+    background-color 0.18s var(--ease-quint),
+    border-color 0.18s var(--ease-quint),
+    box-shadow 0.18s var(--ease-quint),
+    color 0.18s var(--ease-quint),
+    transform 0.18s var(--ease-quint);
+}
+.btn:hover { transform: translateY(-2px); }
+.btn:active { transform: translateY(0); }
+
+.btn-primary {
+  background: var(--color-violet);
+  color: #fff;
+  border-color: var(--color-violet);
+  box-shadow: 0 10px 22px rgb(119 26 175 / 20%);
+}
+.btn-primary:hover {
+  background: var(--color-violet-dark);
+  border-color: var(--color-violet-dark);
+  color: #fff;
+  box-shadow: 0 14px 28px rgb(119 26 175 / 26%);
+}
+
+.btn-secondary { background: transparent; color: var(--color-violet); }
+.btn-secondary:hover { background: var(--color-mist); color: var(--color-violet); }
+
+.btn-light {
+  flex: none;
+  border-color: #fff;
+  background: #fff;
+  color: var(--color-violet);
+  box-shadow: none;
+}
+.btn-light:hover {
+  border-color: rgb(255 255 255 / 92%);
+  background: rgb(255 255 255 / 92%);
+  color: var(--color-violet);
+  box-shadow: 0 4px 16px rgb(0 0 0 / 15%);
+}
+
+/* ─────────────────────────────────────────────────────────────
+   Scroll-reveal system — elements with [data-reveal] start hidden
+   and animate in when they enter the viewport (JS adds .is-visible).
+   Stagger children with [data-reveal-stagger] via --i custom prop.
+   ───────────────────────────────────────────────────────────── */
+@layer components {
+  [data-reveal] {
+    opacity: 0;
+    transform: translateY(22px);
+    transition:
+      opacity 0.7s var(--ease-quint),
+      transform 0.7s var(--ease-quint);
+    transition-delay: calc(var(--reveal-delay, 0) * 1ms);
+    will-change: opacity, transform;
+  }
+
+  [data-reveal].is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  [data-reveal-stagger] > * {
+    opacity: 0;
+    transform: translateY(20px);
+    transition:
+      opacity 0.6s var(--ease-quint),
+      transform 0.6s var(--ease-quint);
+    transition-delay: calc(var(--i, 0) * 80ms);
+  }
+
+  [data-reveal-stagger].is-visible > * {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  /* Never leave content invisible when motion is reduced */
+  [data-reveal],
+  [data-reveal-stagger] > * {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}

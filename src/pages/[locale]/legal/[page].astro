@@ -1,0 +1,39 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { getLegalPage } from '../../../lib/content';
+import { getLocale, locales, localizedPath } from '../../../content/site';
+import '../../../styles/legal.css';
+
+export async function getStaticPaths() {
+  const pages = ['privacy', 'cookie', 'terms'];
+  return locales.flatMap((locale) => pages.map((page) => ({ params: { locale, page } })));
+}
+
+const locale = getLocale(Astro.params.locale);
+const pageKey = Astro.params.page ?? 'privacy';
+
+if (!['privacy', 'cookie', 'terms'].includes(pageKey)) {
+  return Astro.redirect(localizedPath(locale));
+}
+
+const legalPage = await getLegalPage(locale, pageKey);
+if (!legalPage) {
+  return Astro.redirect(localizedPath(locale));
+}
+---
+
+<BaseLayout
+  locale={locale}
+  path={`legal/${pageKey}`}
+  title={legalPage.title}
+  description={legalPage.title}
+>
+  <article class="legal-page">
+    <header class="legal-page__header">
+      <p class="eyebrow">QUINT / {legalPage.title.toUpperCase()}</p>
+      <h1>{legalPage.title}</h1>
+      <p class="legal-page__date">{locale === 'it' ? 'Ultimo aggiornamento' : 'Last updated'}: {legalPage.last_updated}</p>
+    </header>
+    <div class="legal-page__content" set:html={legalPage.content} />
+  </article>
+</BaseLayout>

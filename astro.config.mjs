@@ -1,9 +1,17 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
+import tailwindcss from '@tailwindcss/vite';
+import { resolveSiteOrigin } from './src/config/site-origin.mjs';
+
+const command = process.argv.includes('build') ? 'build' : 'dev';
+const site = resolveSiteOrigin(process.env, command);
 
 export default defineConfig({
-  site: process.env.SITE_URL ?? 'http://localhost:4321',
-  integrations: [sitemap({ i18n: { defaultLocale: 'it', locales: { it: 'it-IT', en: 'en-US' } } })],
+  site,
+  integrations: [sitemap({
+    i18n: { defaultLocale: 'it', locales: { it: 'it-IT', en: 'en-US' } },
+    filter: (page) => new URL(page, site).pathname !== '/'
+  })],
   output: 'static',
-  vite: { server: { host: true } }
+  vite: { plugins: [tailwindcss()], server: { host: true } }
 });
