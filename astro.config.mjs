@@ -13,6 +13,10 @@ export default defineConfig({
     filter: (page) => new URL(page, site).pathname !== '/'
   })],
   output: 'static',
+  // Inline CSS into each page so the design-system stylesheet is no longer a
+  // render-blocking request on the critical path (improves FCP/LCP). Astro's
+  // CSP hashes the inlined <style> blocks, so this stays CSP-compliant.
+  build: { inlineStylesheets: 'always' },
   experimental: {
     fonts: [{
       provider: fontProviders.google(),

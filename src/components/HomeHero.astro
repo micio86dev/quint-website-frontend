@@ -14,7 +14,7 @@ const { copy, locale, primaryAction, secondaryAction } = Astro.props as {
   class="max-w-[1200px] mx-auto px-[clamp(1.25rem,4vw,3rem)] max-[520px]:px-5 grid grid-cols-1 gap-12 items-center pt-[clamp(4.25rem,9vw,8.5rem)] pb-[clamp(4.5rem,8vw,7.5rem)] min-[900px]:grid-cols-[minmax(0,0.96fr)_minmax(440px,1.04fr)] min-[900px]:gap-[clamp(3rem,7vw,7.5rem)] min-[900px]:min-h-[min(760px,calc(100vh-72px))]"
   aria-labelledby="home-hero-title"
 >
-  <div class="max-w-[700px] min-[900px]:max-w-[610px]" data-reveal>
+  <div class="max-w-[700px] min-[900px]:max-w-[610px]">
     <p class="eyebrow">{copy.eyebrow}</p>
     <h1 id="home-hero-title" class="mx-0 mb-0 mt-[0.2rem] font-extrabold tracking-[-0.06em] max-w-[11.5ch] text-[clamp(3rem,5.7vw,5.65rem)] leading-[1.05] pb-1 max-[520px]:text-[clamp(2.65rem,13vw,3.5rem)]">{copy.title}</h1>
     <p class="max-w-[57ch] mt-6 text-muted text-[clamp(1.06rem,1.5vw,1.22rem)]">{copy.body}</p>
