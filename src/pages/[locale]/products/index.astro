@@ -25,7 +25,7 @@ const families = ['diagnostics', 'research', 'quality'] as const;
   {families.map((family, i) => (
     <section class="max-w-[1200px] mx-auto px-[clamp(1.25rem,4vw,3rem)] py-[clamp(4.8rem,9vw,8rem)] border-t border-line" aria-labelledby={`${family}-title`}>
       <div class="grid grid-cols-[minmax(70px,0.2fr)_1fr] gap-x-6 items-baseline mb-[clamp(2.2rem,4vw,3.5rem)]" data-reveal>
-        <p class="eyebrow text-orange text-base row-span-2 col-start-1 self-start">0{i + 1}</p>
+        <p class="eyebrow text-orange-deep text-base row-span-2 col-start-1 self-start">0{i + 1}</p>
         <h2 id={`${family}-title`} class="col-start-2 m-0 max-w-[17ch] font-extrabold tracking-[-0.06em] text-[clamp(2.2rem,4.2vw,4.25rem)] leading-[1.08]">{t[`families.${family}.title`]}</h2>
         <p class="col-start-2 m-0 text-muted text-base">{t[`families.${family}.description`]}</p>
       </div>

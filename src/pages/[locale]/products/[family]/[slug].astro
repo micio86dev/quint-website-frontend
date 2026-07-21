@@ -44,7 +44,7 @@ const proseClasses = [
   '[&_p]:text-muted [&_p]:leading-[1.7] [&_p]:mb-4 [&_p]:max-w-[65ch]',
   '[&_strong]:text-ink',
   '[&_ul]:list-none [&_ul]:m-0 [&_ul]:mb-4 [&_ul]:p-0 [&_ul]:grid [&_ul]:gap-2.5',
-  "[&_li]:relative [&_li]:pl-7 [&_li]:text-muted [&_li]:leading-[1.55] [&_li]:before:content-['✦'] [&_li]:before:absolute [&_li]:before:left-0 [&_li]:before:top-0 [&_li]:before:text-orange [&_li]:before:font-bold",
+  "[&_li]:relative [&_li]:pl-7 [&_li]:text-muted [&_li]:leading-[1.55] [&_li]:before:content-['✦'] [&_li]:before:absolute [&_li]:before:left-0 [&_li]:before:top-0 [&_li]:before:text-orange-deep [&_li]:before:font-bold",
 ].join(' ');
 ---
 
@@ -57,7 +57,7 @@ const proseClasses = [
   <section class="bg-mist">
     <div class="max-w-[1200px] mx-auto px-[clamp(1.25rem,4vw,3rem)] pt-[clamp(4.5rem,10vw,8rem)] pb-[clamp(3.5rem,8vw,6rem)] grid grid-cols-1 gap-[clamp(2.5rem,6vw,5rem)] items-center min-[900px]:grid-cols-[minmax(0,1fr)_minmax(0,0.85fr)]">
       <div data-reveal>
-        <p class="eyebrow text-orange">{familyTitle}</p>
+        <p class="eyebrow text-orange-deep">{familyTitle}</p>
         <h1 class="m-0 max-w-[13ch] font-extrabold tracking-[-0.06em] text-[clamp(2.6rem,5vw,4.5rem)] leading-[1.04]">{product.title}</h1>
         <p class="max-w-[52ch] mt-6 text-muted text-[clamp(1.06rem,1.5vw,1.22rem)] leading-[1.6]">{product.summary}</p>
         <div class="flex items-center gap-4 max-w-[640px] my-8 py-5 px-6 bg-white border border-line border-l-4 border-l-orange rounded-r-lg">

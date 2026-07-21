@@ -1,4 +1,4 @@
-import { defineConfig } from 'astro/config';
+import { defineConfig, fontProviders } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 import tailwindcss from '@tailwindcss/vite';
 import { resolveSiteOrigin } from './src/config/site-origin.mjs';
@@ -13,5 +13,16 @@ export default defineConfig({
     filter: (page) => new URL(page, site).pathname !== '/'
   })],
   output: 'static',
+  experimental: {
+    fonts: [{
+      provider: fontProviders.google(),
+      name: 'Open Sans',
+      cssVariable: '--font-open-sans',
+      weights: [400, 600, 700, 800],
+      styles: ['normal'],
+      subsets: ['latin'],
+      fallbacks: ['Arial', 'sans-serif']
+    }]
+  },
   vite: { plugins: [tailwindcss()], server: { host: true } }
 });

@@ -11,13 +11,16 @@
   --color-violet-dark: #58137D;
   --color-orange: #E45526;
   --color-orange-dark: #C94A1F;
+  /* Accessible orange for TEXT on light backgrounds (brand orange fails WCAG AA
+     as small text: 3.68:1). Use text-orange-deep for eyebrows, numbers, markers. */
+  --color-orange-deep: #B8431C;
   --color-ink: #1C1930;
   --color-paper: #FFFDFA;
   --color-mist: #F3EFF7;
   --color-line: #DDD5E4;
   --color-muted: #625D72;
 
-  --font-sans: 'Open Sans', Arial, sans-serif;
+  --font-sans: var(--font-open-sans, 'Open Sans'), Arial, sans-serif;
 
   --ease-quint: cubic-bezier(0.22, 1, 0.36, 1);
 
@@ -58,6 +61,7 @@
   --violet: var(--color-violet);
   --violet-dark: var(--color-violet-dark);
   --orange: var(--color-orange);
+  --orange-deep: var(--color-orange-deep);
   --ink: var(--color-ink);
   --paper: var(--color-paper);
   --mist: var(--color-mist);

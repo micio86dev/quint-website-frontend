@@ -1,4 +1,5 @@
 ---
+import { Font } from 'astro:assets';
 import { getLocale, localizedPath, type Locale } from '../content/site';
 import { getSiteText } from '../lib/content';
 import '../styles/app.css';
@@ -32,9 +33,7 @@ const currentYear = new Date().getFullYear();
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700;800&display=swap" rel="stylesheet" />
+    <Font cssVariable="--font-open-sans" preload />
     <script is:inline type="application/ld+json" set:html={JSON.stringify({ '@context': 'https://schema.org', '@type': 'Organization', name: 'Quint', url: Astro.site?.toString(), description: t['brandStatement'] })} />
   </head>
   <body>
@@ -102,6 +101,15 @@ const currentYear = new Date().getFullYear();
       </div>
     </footer>
     <script is:inline>
+      // Remember the active language so the root locale router (/) can honour the
+      // visitor's last choice on their next visit. Functional preference cookie, 1 year.
+      (function () {
+        const lang = document.documentElement.lang;
+        if (lang === 'it' || lang === 'en') {
+          document.cookie = 'quint-lang=' + lang + ';path=/;max-age=31536000;SameSite=Lax';
+        }
+      })();
+
       const toggle = document.querySelector('.nav-toggle');
       const mobileNav = document.getElementById('mobile-nav');
 

@@ -1,3 +1,28 @@
 ---
-return Astro.redirect('/it/');
+// Client-side locale router. The site ships as a static build (output: 'static'),
+// so there is no server to negotiate `Accept-Language` — detection runs in the browser.
+// Priority: previously chosen language (cookie) → browser language (Italian → it) → en.
 ---
+<!doctype html>
+<html lang="it">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex" />
+    <title>Quint</title>
+    <link rel="canonical" href="/it/" />
+    <script is:inline>
+      (function () {
+        var supported = ['it', 'en'];
+        var saved = (document.cookie.match(/(?:^|;\s*)quint-lang=([^;]+)/) || [])[1];
+        var locale = supported.indexOf(saved) !== -1
+          ? saved
+          : ((navigator.languages || [navigator.language || '']).some(function (l) {
+              return /^it(-|$)/i.test(l);
+            }) ? 'it' : 'en');
+        location.replace('/' + locale + '/');
+      })();
+    </script>
+    <noscript><meta http-equiv="refresh" content="0; url=/it/" /></noscript>
+  </head>
+  <body></body>
+</html>
