@@ -1,7 +1,9 @@
 export type ContactPayload = { name: string; email: string; company?: string; message: string; locale: string; website?: string };
 type Validation = { valid: boolean; errors: Record<string, string> };
 
-export function validateContact(data: ContactPayload): Validation {
+// Validation only needs the user-entered fields; locale is carried on the
+// submit payload but is irrelevant to whether the input is valid.
+export function validateContact(data: Omit<ContactPayload, 'locale'>): Validation {
   const errors: Record<string, string> = {};
   if (data.name.trim().length < 2) errors.name = 'name';
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim())) errors.email = 'email';
