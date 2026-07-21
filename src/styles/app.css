@@ -19,6 +19,9 @@
   --color-mist: #F3EFF7;
   --color-line: #DDD5E4;
   --color-muted: #625D72;
+  /* Feedback colors — WCAG AA on light backgrounds (5.5:1 / 6.4:1 on paper). */
+  --color-danger: #C62828;
+  --color-success: #276B34;
 
   --font-sans: var(--font-open-sans, 'Open Sans'), Arial, sans-serif;
 
@@ -67,6 +70,8 @@
   --mist: var(--color-mist);
   --line: var(--color-line);
   --muted: var(--color-muted);
+  --danger: var(--color-danger);
+  --success: var(--color-success);
   --shadow: var(--shadow-quint);
   --max: var(--container-shell);
   --ease-out-quint: var(--ease-quint);
@@ -85,6 +90,10 @@
     background-color: var(--color-paper);
     color: var(--color-ink);
   }
+
+  /* Scroll lock while the mobile nav overlay is open (set via JS class,
+     replacing an inline style for CSP compliance). */
+  body.nav-lock { overflow: hidden; }
 
   a:focus-visible,
   button:focus-visible,
@@ -187,6 +196,20 @@
     opacity: 1;
     transform: none;
   }
+
+  /* Stagger index --i set statically (was JS inline style) for CSP compliance. */
+  [data-reveal-stagger] > *:nth-child(1)  { --i: 0; }
+  [data-reveal-stagger] > *:nth-child(2)  { --i: 1; }
+  [data-reveal-stagger] > *:nth-child(3)  { --i: 2; }
+  [data-reveal-stagger] > *:nth-child(4)  { --i: 3; }
+  [data-reveal-stagger] > *:nth-child(5)  { --i: 4; }
+  [data-reveal-stagger] > *:nth-child(6)  { --i: 5; }
+  [data-reveal-stagger] > *:nth-child(7)  { --i: 6; }
+  [data-reveal-stagger] > *:nth-child(8)  { --i: 7; }
+  [data-reveal-stagger] > *:nth-child(9)  { --i: 8; }
+  [data-reveal-stagger] > *:nth-child(10) { --i: 9; }
+  [data-reveal-stagger] > *:nth-child(11) { --i: 10; }
+  [data-reveal-stagger] > *:nth-child(12) { --i: 11; }
 
   [data-reveal-stagger] > * {
     opacity: 0;

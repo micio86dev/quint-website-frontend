@@ -138,7 +138,10 @@ const { locale, copy, errorCopy } = Astro.props;
         firstInvalidField ??= input;
       });
       firstInvalidField?.focus();
-      if (status) status.textContent = '';
+      if (status) {
+        status.textContent = '';
+        status.classList.remove('form-status--error', 'form-status--success');
+      }
       return;
     }
 
@@ -166,13 +169,60 @@ const { locale, copy, errorCopy } = Astro.props;
       if (counter && form.dataset.messageCounter) {
         counter.textContent = '0 ' + form.dataset.messageCounter;
       }
-      if (status) status.textContent = form.dataset.success ?? '';
+      if (status) {
+        status.textContent = form.dataset.success ?? '';
+        status.classList.remove('form-status--error');
+        status.classList.add('form-status--success');
+      }
     } catch {
-      if (status) status.textContent = form.dataset.failure ?? '';
+      if (status) {
+        status.textContent = form.dataset.failure ?? '';
+        status.classList.remove('form-status--success');
+        status.classList.add('form-status--error');
+      }
     } finally {
       button.disabled = false;
     }
   });
+
+  // WebMCP: expose the contact form as a callable tool so AI agents can submit a
+  // request reliably. Feature-detected against the emerging navigator.modelContext
+  // API, so it is a harmless no-op in browsers without agent support.
+  const modelContext = (navigator as unknown as { modelContext?: { registerTool?: (t: unknown) => void; provideContext?: (c: unknown) => void } }).modelContext;
+  if (form && modelContext) {
+    const setField = (name: string, value: unknown) => {
+      const el = form.elements.namedItem(name);
+      if ((el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) && value != null) {
+        el.value = String(value);
+      }
+    };
+    const tool = {
+      name: 'submit_contact_request',
+      description: 'Send a contact request to the Quint team. Fills and submits the contact form (name, work email, optional company, and message).',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          firstName: { type: 'string', description: 'Contact first name' },
+          lastName: { type: 'string', description: 'Contact last name' },
+          email: { type: 'string', description: 'Work email address' },
+          company: { type: 'string', description: 'Company name (optional)' },
+          message: { type: 'string', description: 'Message (min 12 characters)' }
+        },
+        required: ['firstName', 'lastName', 'email', 'message']
+      },
+      async execute(input: Record<string, unknown>) {
+        setField('first_name', input.firstName);
+        setField('last_name', input.lastName);
+        setField('email', input.email);
+        setField('company', input.company);
+        setField('message', input.message);
+        form.requestSubmit();
+        return { content: [{ type: 'text', text: 'Contact form submitted.' }] };
+      }
+    };
+    if (modelContext.registerTool) modelContext.registerTool(tool);
+    else modelContext.provideContext?.({ tools: [tool] });
+  }
 </script>
 
 <style>
@@ -265,9 +315,14 @@ const { locale, copy, errorCopy } = Astro.props;
     margin: 0.75rem 0 0;
   }
 
-  .field-error {
+  .form-status--error { color: var(--danger); }
+  .form-status--success { color: var(--success); }
+
+  /* Field errors are created at runtime via createElement, so they never receive
+     Astro's scoped data-astro-cid attribute — the rule must be global to match. */
+  :global(.field-error) {
     font-size: 0.78rem;
-    color: var(--orange-text, #a83f1b);
+    color: var(--danger);
     font-weight: 600;
   }
 

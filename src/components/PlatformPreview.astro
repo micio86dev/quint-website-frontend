@@ -90,7 +90,7 @@ const railLabels = slideNames.slice(0, totalSlides);
           <div class="beai-score-strip">
             <span class="beai-score-strip__label">{ui.topLabel}</span>
             <div class="beai-score-strip__bar">
-              <div class="beai-score-strip__fill" style="width:94%"></div>
+              <div class="beai-score-strip__fill w-[94%]"></div>
             </div>
             <span class="beai-score-strip__val">94</span>
           </div>
@@ -102,22 +102,22 @@ const railLabels = slideNames.slice(0, totalSlides);
           <div class="beai-ranking">
             <div class="beai-rank-row beai-rank-row--gold">
               <span class="beai-rank-pos">1</span>
-              <div class="beai-rank-bar"><div class="beai-rank-fill" style="width:94%"></div></div>
+              <div class="beai-rank-bar"><div class="beai-rank-fill w-[94%]"></div></div>
               <span class="beai-rank-val">94</span>
             </div>
             <div class="beai-rank-row">
               <span class="beai-rank-pos">2</span>
-              <div class="beai-rank-bar"><div class="beai-rank-fill" style="width:87%"></div></div>
+              <div class="beai-rank-bar"><div class="beai-rank-fill w-[87%]"></div></div>
               <span class="beai-rank-val">87</span>
             </div>
             <div class="beai-rank-row">
               <span class="beai-rank-pos">3</span>
-              <div class="beai-rank-bar"><div class="beai-rank-fill beai-rank-fill--mid" style="width:71%"></div></div>
+              <div class="beai-rank-bar"><div class="beai-rank-fill beai-rank-fill--mid w-[71%]"></div></div>
               <span class="beai-rank-val beai-rank-val--mid">71</span>
             </div>
             <div class="beai-rank-row">
               <span class="beai-rank-pos">4</span>
-              <div class="beai-rank-bar"><div class="beai-rank-fill beai-rank-fill--low" style="width:58%"></div></div>
+              <div class="beai-rank-bar"><div class="beai-rank-fill beai-rank-fill--low w-[58%]"></div></div>
               <span class="beai-rank-val beai-rank-val--low">58</span>
             </div>
           </div>
@@ -141,7 +141,7 @@ const railLabels = slideNames.slice(0, totalSlides);
             </div>
             <div class="beai-progress-wrap">
               <div class="beai-progress-bar">
-                <div class="beai-progress-fill" style="width:67%"></div>
+                <div class="beai-progress-fill w-[67%]"></div>
               </div>
               <span class="beai-progress-label">67% {ui.progress}</span>
             </div>
@@ -173,7 +173,9 @@ const railLabels = slideNames.slice(0, totalSlides);
   </div>
 </section>
 
-<script is:inline>
+<script>
+  // @ts-nocheck — vanilla DOM runtime script (was is:inline, now bundled so
+  // Astro can hash it for CSP); not part of the type-checked app surface.
   (function () {
     const wrap = document.getElementById('beai-slides');
     if (!wrap) return;

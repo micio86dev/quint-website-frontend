@@ -34,7 +34,7 @@ const currentYear = new Date().getFullYear();
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <Font cssVariable="--font-open-sans" preload />
-    <script is:inline type="application/ld+json" set:html={JSON.stringify({ '@context': 'https://schema.org', '@type': 'Organization', name: 'Quint', url: Astro.site?.toString(), description: t['brandStatement'] })} />
+    <script type="application/ld+json" set:html={JSON.stringify({ '@context': 'https://schema.org', '@type': 'Organization', name: 'Quint', url: Astro.site?.toString(), description: t['brandStatement'] })} />
   </head>
   <body>
     <a class="skip-link" href="#content">{t['skipLink']}</a>
@@ -100,7 +100,9 @@ const currentYear = new Date().getFullYear();
         <p class="max-w-[1200px] mx-auto px-[clamp(1.25rem,4vw,3rem)] py-5 m-0 text-center text-[0.78rem] text-muted">© {currentYear} Quint S.r.l. — {t['footer.copyright'] || (locale === 'it' ? 'Tutti i diritti riservati.' : 'All rights reserved.')}</p>
       </div>
     </footer>
-    <script is:inline>
+    <script>
+      // @ts-nocheck — vanilla DOM runtime script (was is:inline, now bundled so
+      // Astro can hash it for CSP); not part of the type-checked app surface.
       // Remember the active language so the root locale router (/) can honour the
       // visitor's last choice on their next visit. Functional preference cookie, 1 year.
       (function () {
@@ -116,14 +118,14 @@ const currentYear = new Date().getFullYear();
       function openMenu() {
         toggle.setAttribute('aria-expanded', 'true');
         mobileNav.removeAttribute('inert');
-        document.body.style.overflow = 'hidden';
+        document.body.classList.add('nav-lock');
         toggle.setAttribute('aria-label', toggle.dataset.labelClose ?? '');
       }
 
       function closeMenu() {
         toggle.setAttribute('aria-expanded', 'false');
         mobileNav.setAttribute('inert', '');
-        document.body.style.overflow = '';
+        document.body.classList.remove('nav-lock');
         toggle.setAttribute('aria-label', toggle.dataset.labelOpen ?? '');
       }
 
@@ -144,21 +146,15 @@ const currentYear = new Date().getFullYear();
       cookieAccept?.addEventListener('click', () => {
         localStorage.setItem('quint-cookies-ok', '1');
         if (cookieBar) {
-          cookieBar.style.transform = 'translateY(100%)';
-          cookieBar.style.opacity = '0';
+          cookieBar.classList.add('is-hiding');
           setTimeout(() => cookieBar.setAttribute('hidden', ''), 350);
         }
       });
 
       // ── Scroll reveal + count-up ──────────────────────────────
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-      // Assign stagger index to children of [data-reveal-stagger]
-      document.querySelectorAll('[data-reveal-stagger]').forEach((group) => {
-        Array.from(group.children).forEach((child, i) => {
-          child.style.setProperty('--i', String(i));
-        });
-      });
+      // Stagger delay for [data-reveal-stagger] children is driven by static
+      // :nth-child --i rules in app.css (no inline styles, CSP-friendly).
 
       // Count-up: animate [data-count-to] from 0 to target on reveal
       function runCountUp(el) {
@@ -354,6 +350,7 @@ const currentYear = new Date().getFullYear();
         transition: transform 350ms var(--ease-quint), opacity 300ms ease;
       }
       .cookie-bar[hidden] { display: none; }
+      .cookie-bar.is-hiding { transform: translateY(100%); opacity: 0; }
       .cookie-bar p { margin: 0; flex: 1; min-width: 200px; line-height: 1.5; }
       .cookie-bar a { color: var(--color-orange); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; }
       .cookie-bar a:hover { color: #fff; }
@@ -361,8 +358,8 @@ const currentYear = new Date().getFullYear();
         flex: none;
         min-height: 38px;
         padding: 0.45rem 1.15rem;
-        background: var(--color-orange);
-        border: 2px solid var(--color-orange);
+        background: var(--color-orange-dark);
+        border: 2px solid var(--color-orange-dark);
         border-radius: 6px;
         color: #fff;
         font-size: 0.85rem;
@@ -370,7 +367,7 @@ const currentYear = new Date().getFullYear();
         cursor: pointer;
         transition: background 180ms, border-color 180ms;
       }
-      .cookie-bar button:hover { background: var(--color-orange-dark); border-color: var(--color-orange-dark); }
+      .cookie-bar button:hover { background: var(--color-orange-deep); border-color: var(--color-orange-deep); }
 
       @media (max-width: 760px) {
         .nav-toggle { display: inline-flex; }

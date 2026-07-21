@@ -22,7 +22,20 @@ export default defineConfig({
       styles: ['normal'],
       subsets: ['latin'],
       fallbacks: ['Arial', 'sans-serif']
-    }]
+    }],
+    csp: {
+      algorithm: 'SHA-256',
+      directives: [
+        "default-src 'self'",
+        "img-src 'self' data: https:",
+        "font-src 'self'",
+        "connect-src 'self' https:",
+        "form-action 'self' https:",
+        "object-src 'none'",
+        "base-uri 'self'",
+        "require-trusted-types-for 'script'"
+      ]
+    }
   },
   vite: { plugins: [tailwindcss()], server: { host: true } }
 });
