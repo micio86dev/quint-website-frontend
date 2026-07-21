@@ -1,56 +1,76 @@
 import { expect, test } from '@playwright/test';
 
-test('Italian home guides a visitor to products and contact', async ({ page }) => {
+// These tests are intentionally content-agnostic: the form copy and messages
+// come from the CMS, so expected strings are read from the form's data-*
+// attributes at runtime and elements are selected structurally (name / role /
+// testid). This keeps them stable across copy changes.
+
+test('home navigation reaches products and contact', async ({ page }) => {
   await page.goto('/it/');
-  const navigation = page.getByRole('banner');
-  await expect(navigation).toHaveCSS('width', `${page.viewportSize()?.width}px`);
-  await expect(navigation).toHaveCSS('margin-left', '0px');
-  await expect(page.getByRole('heading', { name: 'Dati scientifici più chiari. Decisioni più sicure.' })).toBeVisible();
-  await expect(page.getByText('Piattaforma scientifica Quint', { exact: true })).toBeVisible();
-  await expect(page.getByRole('heading', { name: 'Intelligenza dei flussi di lavoro' })).toBeVisible();
-  await page.getByRole('link', { name: 'Scopri le soluzioni' }).first().click();
+  const banner = page.getByRole('banner');
+  // Header spans the full viewport width (accessibility / layout regression guard).
+  await expect(banner).toHaveCSS('width', `${page.viewportSize()?.width}px`);
+  await expect(banner).toHaveCSS('margin-left', '0px');
+  await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible();
+
+  await page.locator('a[href="/it/products/"]').first().click();
   await expect(page).toHaveURL(/\/it\/products\/$/);
-  await navigation.getByRole('navigation', { name: 'Navigazione principale' }).getByRole('link', { name: 'Contatti' }).click();
-  await expect(page.getByRole('heading', { name: 'Parliamo del tuo progetto' })).toBeVisible();
+
+  await page.locator('header a[href="/it/contact/"]').first().click();
+  await expect(page).toHaveURL(/\/it\/contact\/$/);
+  await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible();
 });
 
-test('contact form validates through accessible labels', async ({ page }) => {
+test('contact form surfaces accessible, red validation errors', async ({ page }) => {
   await page.goto('/en/contact/');
   const form = page.getByTestId('contact-form');
-  await form.getByRole('button', { name: 'Send request' }).click();
-  const nameError = page.getByText('Please enter your name.', { exact: true });
-  await expect(nameError).toBeVisible();
-  await expect(nameError).toHaveAttribute('id', 'error-name');
-  await expect(form.getByLabel('Full name')).toHaveAttribute('aria-invalid', 'true');
-  await expect(form.getByLabel('Full name')).toHaveAttribute('aria-describedby', 'error-name');
-  await expect(form.getByLabel('Full name')).toBeFocused();
-  await page.getByLabel('Full name').fill('Ada Lovelace');
-  await page.getByLabel('Work email').fill('ada@example.com');
-  await page.getByLabel('Message').fill('I would like a product consultation.');
-  await expect(page.getByTestId('contact-form')).toBeVisible();
+  const firstName = form.locator('input[name="first_name"]');
+
+  const expectedFirstNameError = await form.getAttribute('data-error-first-name');
+
+  await form.locator('button[type="submit"]').click();
+
+  // Every required field reports an error, tied to its input via ARIA.
+  for (const field of ['first_name', 'last_name', 'email', 'message']) {
+    await expect(page.locator(`#error-${field}`)).toBeVisible();
+    await expect(form.locator(`[name="${field}"]`)).toHaveAttribute('aria-invalid', 'true');
+    await expect(form.locator(`[name="${field}"]`)).toHaveAttribute('aria-describedby', `error-${field}`);
+  }
+
+  // Message text comes from the CMS; assert against the form's own data.
+  await expect(page.locator('#error-first_name')).toHaveText(expectedFirstNameError ?? '');
+  // The first invalid field takes focus.
+  await expect(firstName).toBeFocused();
+  // Errors are shown in red (regression guard for the danger token + :global fix).
+  await expect(page.locator('#error-first_name')).toHaveCSS('color', 'rgb(198, 40, 40)');
 });
 
-test('Italian contact form submits the validated localized payload', async ({ page }) => {
+test('contact form submits the validated, localized payload', async ({ page }) => {
   let submittedPayload: Record<string, string> | undefined;
   await page.route('**/api/quint/contact', async (route) => {
     submittedPayload = JSON.parse(route.request().postData() ?? '{}') as Record<string, string>;
     await route.fulfill({ status: 201, contentType: 'application/json', body: '{}' });
   });
+
   await page.goto('/it/contact/');
   const form = page.getByTestId('contact-form');
-  await form.getByLabel('Nome e cognome').fill('Ada Lovelace');
-  await form.getByLabel('Email di lavoro').fill('ada@example.com');
-  await form.getByLabel('Azienda').fill('Quint Lab');
-  await form.getByLabel('Messaggio').fill('Vorrei una consulenza sui vostri prodotti.');
-  await form.getByRole('button', { name: 'Invia richiesta' }).click();
-  await expect(page.getByRole('status')).toHaveText('Grazie. La tua richiesta è stata inviata.');
+  const expectedSuccess = await form.getAttribute('data-success');
+
+  await form.locator('input[name="first_name"]').fill('Ada');
+  await form.locator('input[name="last_name"]').fill('Lovelace');
+  await form.locator('input[name="email"]').fill('ada@example.com');
+  await form.locator('input[name="company"]').fill('Quint Lab');
+  await form.locator('textarea[name="message"]').fill('Vorrei una consulenza sui vostri prodotti.');
+  await form.locator('button[type="submit"]').click();
+
+  await expect(page.getByRole('status')).toHaveText(expectedSuccess ?? '');
   expect(submittedPayload).toMatchObject({
     name: 'Ada Lovelace',
     email: 'ada@example.com',
     company: 'Quint Lab',
     message: 'Vorrei una consulenza sui vostri prodotti.',
     website: '',
-    locale: 'it'
+    locale: 'it',
   });
 });
 
@@ -58,11 +78,18 @@ test('contact form reports a failed request', async ({ page }) => {
   await page.route('**/api/quint/contact', async (route) => {
     await route.fulfill({ status: 500, contentType: 'application/json', body: '{}' });
   });
+
   await page.goto('/en/contact/');
   const form = page.getByTestId('contact-form');
-  await form.getByLabel('Full name').fill('Ada Lovelace');
-  await form.getByLabel('Work email').fill('ada@example.com');
-  await form.getByLabel('Message').fill('I would like a product consultation.');
-  await form.getByRole('button', { name: 'Send request' }).click();
-  await expect(page.getByRole('status')).toHaveText('We could not send your request. Please try again later.');
+  const expectedFailure = await form.getAttribute('data-failure');
+
+  await form.locator('input[name="first_name"]').fill('Ada');
+  await form.locator('input[name="last_name"]').fill('Lovelace');
+  await form.locator('input[name="email"]').fill('ada@example.com');
+  await form.locator('textarea[name="message"]').fill('I would like a product consultation.');
+  await form.locator('button[type="submit"]').click();
+
+  const status = page.getByRole('status');
+  await expect(status).toHaveText(expectedFailure ?? '');
+  await expect(status).toHaveClass(/form-status--error/);
 });
