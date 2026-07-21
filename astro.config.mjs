@@ -29,6 +29,10 @@ export default defineConfig({
     }],
     csp: {
       algorithm: 'SHA-256',
+      // strict-dynamic: injected scripts can't run even from 'self' — only our
+      // hashed scripts (and what they load) are trusted. Safe here because every
+      // script is inline and Astro-hashed; there are no external <script src>.
+      scriptDirective: { strictDynamic: true },
       directives: [
         "default-src 'self'",
         "img-src 'self' data: https:",

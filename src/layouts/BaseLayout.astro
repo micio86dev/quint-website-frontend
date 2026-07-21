@@ -120,13 +120,18 @@ const currentYear = new Date().getFullYear();
         mobileNav.removeAttribute('inert');
         document.body.classList.add('nav-lock');
         toggle.setAttribute('aria-label', toggle.dataset.labelClose ?? '');
+        // Move focus into the newly revealed overlay (a11y: direct focus to new content).
+        document.getElementById('mobile-nav-close')?.focus();
       }
 
       function closeMenu() {
+        const wasOpen = toggle.getAttribute('aria-expanded') === 'true';
         toggle.setAttribute('aria-expanded', 'false');
         mobileNav.setAttribute('inert', '');
         document.body.classList.remove('nav-lock');
         toggle.setAttribute('aria-label', toggle.dataset.labelOpen ?? '');
+        // Return focus to the trigger so keyboard users aren't dropped at page top.
+        if (wasOpen) toggle.focus();
       }
 
       toggle?.addEventListener('click', () => {
