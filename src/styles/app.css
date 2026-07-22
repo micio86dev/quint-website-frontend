@@ -10,10 +10,16 @@
   --color-violet: #771AAF;
   --color-violet-dark: #58137D;
   --color-orange: #E45526;
-  --color-orange-dark: #C94A1F;
+  /* Dark orange surface for WHITE text (stats band, buttons). Kept dark enough
+     that white clears WCAG AA with margin: 5.88:1 (brand orange would be 3.73). */
+  --color-orange-dark: #B03F1A;
   /* Accessible orange for TEXT on light backgrounds (brand orange fails WCAG AA
      as small text: 3.68:1). Use text-orange-deep for eyebrows, numbers, markers. */
   --color-orange-deep: #B8431C;
+  /* Accessible orange for TEXT on dark backgrounds — the symmetric counterpart
+     of orange-deep. Use text-orange-bright on bg-ink (6.78:1); brand orange
+     there is only 4.57:1. */
+  --color-orange-bright: #F5854D;
   --color-ink: #1C1930;
   --color-paper: #FFFDFA;
   --color-mist: #F3EFF7;

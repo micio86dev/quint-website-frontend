@@ -19,7 +19,7 @@ const { copy } = Astro.props as { copy: HomeCopy['capabilities'] };
   <ol class="grid grid-cols-1 gap-0 m-0 p-0 list-none border-t border-white/25 md:grid-cols-3" data-reveal-stagger>
     {copy.items.map((item) => (
       <li class="grid grid-cols-[auto_1fr] gap-[1.1rem] py-6 border-t border-white/25 first:border-t-0 md:border-t-0 md:py-8 md:pr-[1.6rem] md:pb-6 md:min-h-[210px] md:border-l md:border-white/25 md:first:border-l-0 md:pl-[1.6rem] md:first:pl-0">
-        <span class="text-orange text-[0.75rem] font-extrabold tracking-[0.08em]">{item.number}</span>
+        <span class="text-orange-bright text-[0.75rem] font-extrabold tracking-[0.08em]">{item.number}</span>
         <div>
           <h3 class="m-0 mb-[0.55rem] text-[1.15rem] tracking-[-0.025em]">{item.title}</h3>
           <p class="m-0 text-white/70 text-[0.92rem]">{item.body}</p>
